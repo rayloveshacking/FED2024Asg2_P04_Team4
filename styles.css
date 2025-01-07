@@ -1,0 +1,49 @@
+/* Custom Styles */
+.hero-section {
+    background-color: #f8f9fa;
+    padding: 60px 0;
+  }
+  
+  .lottie-container {
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  
+  #listings-container .card {
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+  }
+  
+  #listings-container .card:hover {
+    transform: translateY(-5px);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .hero-section h1 {
+      font-size: 2rem;
+    }
+  
+    .hero-section p {
+      font-size: 1rem;
+    }
+  
+    .lottie-container {
+      max-width: 200px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .hero-section h1 {
+      font-size: 1.5rem;
+    }
+  
+    .hero-section p {
+      font-size: 0.9rem;
+    }
+  
+    .lottie-container {
+      max-width: 150px;
+    }
+  }

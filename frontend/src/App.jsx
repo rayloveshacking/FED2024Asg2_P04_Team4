@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes,Route } from 'react-router-dom';
 import Shop from './pages/Shop';
 import New from './pages/New';
-import SecondHand from './pages/SecondHand';
+import Refurbished from './pages/Refurbished';
 import Contact from './pages/Contact';
 import Product from './pages/Product';
 import Cart from './pages/Cart';
@@ -11,15 +11,17 @@ import PlaceOrder from './pages/PlaceOrder';
 import Orders from './pages/Orders';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import SearchBar from './components/SearchBar';
 
 const App = () => {
   return (
     <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
       <Navbar/>
+      <SearchBar />
       <Routes>
         <Route path='/' element={<Shop/>}/>
         <Route path='/new' element={<New/>}/>
-        <Route path='/secondhand' element={<SecondHand/>}/>
+        <Route path='/refurbished' element={<Refurbished/>}/>
         <Route path='/contact' element={<Contact/>}/>
         <Route path='/product/:productId' element={<Product/>}/>
         <Route path='/cart' element={<Cart/>}/>

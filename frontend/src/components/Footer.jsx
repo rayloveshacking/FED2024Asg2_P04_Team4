@@ -8,7 +8,7 @@ const Footer = () => {
         <div>
             <img src={assets.logo} className='mb-5 w-32' alt='' />
             <p className='w-full md:w-2/3 text-gray-600'>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                MokeSell is a premium online store for your shopping needs. We offer a wide range of products from electronics, gadgets, accessories and more.
             </p>
         </div>
 

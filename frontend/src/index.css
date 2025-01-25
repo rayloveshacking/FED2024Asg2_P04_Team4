@@ -1,12 +1,12 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Prata&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Prata&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap');
 
 a.active hr{
     display: block;
 }
 
 *{
-    font-family: 'Outfit';
+    font-family: 'Roboto Condensed';
 }
 
 .prata-regular {

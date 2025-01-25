@@ -1,11 +1,11 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { ShopContext } from '../context/ShopContext'
-import { assets } from '../assets/assets'
+import { assets1 } from '../assets/assets1'
 import Title from '../components/Title'
 import ProductItem from '../components/ProductItem'
 
-const New = () => { 
-  const {products, search, showSearch} = useContext(ShopContext);
+const Refurbished = () => { 
+  const {refurbishedProducts, search, showSearch} = useContext(ShopContext);
   const [showFilter, setShowFilter] = useState(false);
   const [filterProducts, setFilterProducts] = useState([]);
   const [category, setCategory] = useState([]);
@@ -34,7 +34,7 @@ const New = () => {
   }
 
   const applyFilter = () => {
-    let productsCopy = products.slice();
+    let productsCopy = refurbishedProducts.slice();
 
     if (showSearch && search) {
       productsCopy = productsCopy.filter(item => item.name.toLowerCase().includes(search.toLowerCase()))
@@ -84,7 +84,7 @@ useEffect(()=>{
         {/* Filter Options */}
         <div className='min-w-60'>
           <p onClick={()=>setShowFilter(!showFilter)} className='my-2 text-xl flex items-center cursor-pointer gap-2'>FILTERS
-            <img className={`h-3 sm:hidden ${showFilter ? 'rotate-270' : ''}`} src={assets.dropdown_icon1} alt='' />
+            <img className={`h-3 sm:hidden ${showFilter ? 'rotate-270' : ''}`} src={assets1.dropdown_icon1} alt='' />
           </p>
           {/* Filter by Category */}
           <div className={`border border-gray-300 pl-5 py-3 mt-6 ${showFilter ? '' : 'hidden'} sm:block`}>
@@ -126,7 +126,7 @@ useEffect(()=>{
         {/* Right Side */}
         <div className='flex-1'>
           <div className='flex justify-between text-base sm:text-2xl mb-4'>
-            <Title text1={'NEW'} text2={'COLLECTIONS'} />
+            <Title text1={'REFURBISHED'} text2={'COLLECTIONS'} />
             {/* Product Sort */}
             <select onChange={(e)=>setSortType(e.target.value)} className='border-2 border-gray-300 text-sm px-2'>
               <option value="relevant">Sort by: Relevant</option>
@@ -148,4 +148,4 @@ useEffect(()=>{
 
 }
 
-export default New
+export default Refurbished

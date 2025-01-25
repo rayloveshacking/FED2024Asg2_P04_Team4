@@ -1,10 +1,10 @@
 import logo from './websiteicon.png'
-import p_img2 from './dellinspiron.jpg'
-import p_img3 from './gamingpc.jpg'
+import p_img2 from './nitro.jpg'
+import p_img3 from './re1.png'
 import p_img4 from './oldm1.png'
 import p_img5 from './samsungs25.jpg'
 import p_img6 from './ipad1.png'
-import p_img7 from './kb1.jpg'
+import p_img7 from './pinky.png'
 import p_img8 from './rk61.png'
 import p_img9 from './logi.png'
 import p_img10 from './4080.png'
@@ -21,7 +21,7 @@ import support_img from './support.png'
 import dropdown_icon1 from './dropdown1.png'
 import cross_icon from './cross.png'
 
-export const assets = {
+export const assets1 = {
     logo,
     p_img2,
     p_img3,
@@ -49,9 +49,9 @@ export const assets = {
 export const products = [
     {
         _id: "aaaaa",
-        name: "Asus Zephyrus G14",
+        name: "Acer Nitro 7",
         descrption:'A lightweight laptop with a 15.6" display',
-        price: 500,
+        price: 550,
         image:[p_img2],
         category: "Computers",
         subCategory: 'Laptops',
@@ -61,8 +61,8 @@ export const products = [
     },
     {
         _id: "bbbbb",
-        name: "Gaming PC RTX 3080",
-        descrption:'A powerful gaming PC with an RTX 3080 graphics card',
+        name: "Refurbished Old Computer",
+        descrption:'An old computer with a 2nd gen i5 processor',
         price: 1500,
         image:[p_img3],
         category: "Computers",
@@ -90,7 +90,7 @@ export const products = [
         name: "Lenovo Thinkpad",
         descrption:'The toughest laptop in the market',
         price: 1000,
-        image:[p_img6],
+        image:[p_img7],
         category: "Computers",
         subCategory: 'Laptops',
         countInStock: 2,

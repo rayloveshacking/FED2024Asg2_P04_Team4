@@ -1,12 +1,32 @@
-import React, { useContext, useState} from 'react';
+import React, { useContext, useState, useEffect } from 'react';
+import { onAuthStateChanged, getAuth, signOut } from 'firebase/auth';
 import { assets } from '../assets/assets';
 import { NavLink, Link } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
+import app from '../firebase';
 
 const Navbar = () => {
     const [visible, setVisible] = useState(false);
     
     const{setShowSearch} = useContext(ShopContext);
+
+    const [user, setUser] = useState(null);
+    const auth = getAuth(app);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            setUser(user);
+        });
+        return () => unsubscribe();
+    }, []);
+
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    };
 
     return (
         <div className='flex items-center justify-between py-5 font-medium'>
@@ -42,9 +62,15 @@ const Navbar = () => {
                     <img className='w-5 cursor-pointer' src={assets.profile_icon} alt="" />
                     <div className='group-hover:block hidden absolute dropdown-menu right-0 pt-4'>
                         <div className='flex flex-col gap-2 w-36 px-5 bg-slate-100 text-gray-500 rounded'>
-                            <p className='cursor-pointer hover:text-black'>My Profile</p>
-                            <p className='cursor-pointer hover:text-black'>Orders</p>
-                            <p className='cursor-pointer hover:text-black'>LogOut</p>
+                            {user ? (
+                                <>
+                                    <p className='cursor-pointer hover:text-black'>My Profile</p>
+                                    <Link to='/orders' className='cursor-pointer hover:text-black'>Orders</Link>
+                                    <p className='cursor-pointer hover:text-black' onClick={handleLogout}>Logout</p>
+                                </>
+                            ) : (
+                                <Link to='/login' className='cursor-pointer hover:text-black'>Login</Link>
+                            )}
                         </div>
                     </div>
                 </div>

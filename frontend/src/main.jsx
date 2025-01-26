@@ -4,7 +4,7 @@ import './index.css'
 import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import ShopContextProvider from './context/ShopContext.jsx'
-import './firebase' // Add this import
+import './firebase' 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>

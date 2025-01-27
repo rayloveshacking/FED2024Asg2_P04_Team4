@@ -13,6 +13,7 @@ import Orders from './pages/Orders';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import SearchBar from './components/SearchBar';
+import SellerDashboard from './pages/SellerDashBoard';
 
 const App = () => {
   return (
@@ -31,6 +32,7 @@ const App = () => {
         <Route path='/register' element={<Register/>} />
         <Route path='/place-order' element={<PlaceOrder/>}/>
         <Route path='/orders' element={<Orders/>} />
+        <Route path='/seller-dashboard' element={<SellerDashboard/>} />
       </Routes>
       <Footer/>
     </div>

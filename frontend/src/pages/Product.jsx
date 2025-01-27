@@ -1,6 +1,8 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { useParams, useLocation } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
+import { doc, getDoc } from "firebase/firestore";
+import { db } from '../firebase';
 
 const Product = () => {
   const { productId } = useParams();
@@ -14,22 +16,19 @@ const Product = () => {
   const productType = location.pathname.includes('/refurbished/') ? 'refurbished' : 'new';
 
   useEffect(() => {
-    // Select the correct product array
-    const productSource = productType === 'refurbished' ? refurbishedProducts : products;
-    
-    const foundProduct = productSource.find(item => 
-      item?._id?.toString() === productId?.toString()
-    );
+    const fetchProduct = async () => {
+        const docRef = doc(db, 'products', productId);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+            setProductData({ id: docSnap.id, ...docSnap.data() });
+        } else {
+            console.log('No such document!');
+        }
+    };
 
-    if (foundProduct) {
-      setProductData(foundProduct);
-      setMainImage(foundProduct.image?.[0] || '');
-      console.log('Product Data:', foundProduct); // Debug log
-    } else {
-      console.warn(`Product not found in ${productType} category`);
-      setProductData(null);
-    }
-  }, [productId, productType, products, refurbishedProducts]);
+    fetchProduct();
+}, [productId]);
 
   return productData ? (
     <div className='border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100'>

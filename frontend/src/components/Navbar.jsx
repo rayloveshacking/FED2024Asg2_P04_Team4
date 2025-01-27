@@ -5,6 +5,9 @@ import { NavLink, Link } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
 import app from '../firebase';
 
+
+
+
 const Navbar = () => {
     const [visible, setVisible] = useState(false);
     

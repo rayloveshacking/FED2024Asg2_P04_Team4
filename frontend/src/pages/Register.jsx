@@ -33,18 +33,30 @@ const Register = () => {
             <h2 className="text-2xl font-bold mb-4">Register</h2>
             {error && <p className="text-red-500 mb-4">{error}</p>}
             <form onSubmit={handleRegister}>
-            <div className="mb-4">
-                <label className="block mb-2">Account Type</label>
-                <select
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    className="w-full p-2 border rounded"
-                    required
-                >
-                    <option value="customer">Customer</option>
-                    <option value="seller">Seller</option>
-                </select>
-            </div>
+                {/* Added email input field */}
+                <div className="mb-4">
+                    <label className="block mb-2">Email</label>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full p-2 border rounded"
+                        required
+                    />
+                </div>
+                
+                <div className="mb-4">
+                    <label className="block mb-2">Account Type</label>
+                    <select
+                        value={role}
+                        onChange={(e) => setRole(e.target.value)}
+                        className="w-full p-2 border rounded"
+                        required
+                    >
+                        <option value="customer">Customer</option>
+                        <option value="seller">Seller</option>
+                    </select>
+                </div>
                 <div className="mb-4">
                     <label className="block mb-2">Password</label>
                     <input

@@ -4,13 +4,16 @@ import Title from './Title';
 import ProductItem from './ProductItem';
 
 const BestSeller = () => {
-  const { products } = useContext(ShopContext);
+  const { products, refurbishedProducts } = useContext(ShopContext);
   const [bestSeller, setBestSeller] = useState([]);
 
+  // Combine new and refurbished products into one array.
+  const allProducts = [...products, ...refurbishedProducts];
+
   useEffect(() => {
-    const bestProduct = products.filter((item) => item.bestseller);
-    setBestSeller(bestProduct.slice(0, 5));
-  }, [products]);
+    const best = allProducts.filter((item) => item.bestseller);
+    setBestSeller(best.slice(0, 5));
+  }, [products, refurbishedProducts]);
 
   return (
     <div className='my-10'>

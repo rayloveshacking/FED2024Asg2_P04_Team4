@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { db } from '../firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import app from '../firebase';
 
@@ -15,25 +15,21 @@ const SellerDashboard = () => {
     category: 'Computers',
     subCategory: 'Laptops',
     type: 'new',
-    image: [] // This will hold the Cloudinary image URLs
+    image: [] // Cloudinary image URLs
   });
   const [files, setFiles] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [uploading, setUploading] = useState(false);
 
-  // Function to upload a single image file to Cloudinary
+  // Upload a single image to Cloudinary
   const uploadImageToCloudinary = async (file) => {
     const data = new FormData();
     data.append('file', file);
-    data.append('upload_preset', 'unsigned_preset'); // Replace with your unsigned upload preset
-    data.append('cloud_name', 'dls2ndk2q'); // Replace with your Cloudinary cloud name
-
+    data.append('upload_preset', 'unsigned_preset'); // your preset
+    data.append('cloud_name', 'dls2ndk2q'); // your cloud name
     try {
-      const res = await axios.post(
-        `https://api.cloudinary.com/v1_1/dls2ndk2q/image/upload`,
-        data
-      );
+      const res = await axios.post(`https://api.cloudinary.com/v1_1/dls2ndk2q/image/upload`, data);
       return res.data.secure_url;
     } catch (err) {
       console.error('Cloudinary upload error:', err);
@@ -41,13 +37,22 @@ const SellerDashboard = () => {
     }
   };
 
-  // Handle file selection
+  // Check active listings count
+  const checkActiveListingsLimit = async () => {
+    const q = query(
+      collection(db, 'products'),
+      where('sellerId', '==', auth.currentUser.uid),
+      where('active', '==', true)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.size;
+  };
+
   const handleFilesChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     setFiles(selectedFiles);
   };
 
-  // Handle product upload: upload images then save full product details to Firestore
   const handleUpload = async (e) => {
     e.preventDefault();
     setError('');
@@ -55,30 +60,32 @@ const SellerDashboard = () => {
     setUploading(true);
 
     try {
-      if (!files.length) {
-        throw new Error('Please upload at least one image');
+      // Enforce active listings limit of 30
+      const activeCount = await checkActiveListingsLimit();
+      if (activeCount >= 30) {
+        throw new Error("You have reached the maximum of 30 active listings.");
       }
 
-      // Upload all selected files to Cloudinary and collect their URLs
-      const uploadedUrls = await Promise.all(
-        files.map(file => uploadImageToCloudinary(file))
-      );
+      if (!files.length) {
+        throw new Error("Please upload at least one image.");
+      }
 
-      // Build the new product object
+      const uploadedUrls = await Promise.all(files.map(file => uploadImageToCloudinary(file)));
+
       const newProduct = {
         ...product,
         image: uploadedUrls,
         price: Number(product.price),
-        createdAt: serverTimestamp(),
         sellerId: auth.currentUser.uid,
-        bestseller: false // Default value
+        sellerName: auth.currentUser.displayName || '',
+        active: true,       // Mark listing as active
+        bump: 0,            // Default bump value
+        createdAt: serverTimestamp()
       };
 
-      // Save product data to Firestore
       await addDoc(collection(db, 'products'), newProduct);
 
-      setSuccess('Product uploaded successfully!');
-      // Reset form state
+      setSuccess("Product uploaded successfully!");
       setProduct({
         name: '',
         price: '',
@@ -89,9 +96,9 @@ const SellerDashboard = () => {
         image: []
       });
       setFiles([]);
-    } catch (error) {
-      console.error('Error uploading product:', error);
-      setError(error.message);
+    } catch (err) {
+      console.error("Error uploading product:", err);
+      setError(err.message);
     }
     setUploading(false);
   };

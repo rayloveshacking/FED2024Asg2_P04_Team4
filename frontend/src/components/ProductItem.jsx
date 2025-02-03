@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 const ProductItem = ({ id, image, name, price }) => {
   const { currency } = useContext(ShopContext);
 
-  // Determine the correct image source: if image is an array, use the first element; if not, use image directly.
+  // If image is an array, use the first element; otherwise use image directly.
   const imageSrc = Array.isArray(image) ? image[0] : image;
 
   return (
@@ -16,7 +16,7 @@ const ProductItem = ({ id, image, name, price }) => {
           src={imageSrc}
           alt={name}
           onError={(e) => {
-            e.target.src = 'path/to/default/image.png'; // Ensure you have a valid fallback path if needed.
+            e.target.src = 'path/to/default/image.png';
           }}
         />
       </div>

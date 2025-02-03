@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
 import { doc, getDoc } from "firebase/firestore";
@@ -17,18 +17,25 @@ const Product = () => {
 
   useEffect(() => {
     const fetchProduct = async () => {
-        const docRef = doc(db, 'products', productId);
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-            setProductData({ id: docSnap.id, ...docSnap.data() });
-        } else {
-            console.log('No such document!');
-        }
+      const docRef = doc(db, 'products', productId);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        setProductData({ id: docSnap.id, ...docSnap.data() });
+      } else {
+        console.log('No such document!');
+      }
     };
 
     fetchProduct();
-}, [productId]);
+  }, [productId]);
+
+  // Automatically set mainImage when productData loads
+  useEffect(() => {
+    if (productData && productData.image && productData.image.length > 0 && !mainImage) {
+      setMainImage(productData.image[0]);
+    }
+  }, [productData, mainImage]);
 
   return productData ? (
     <div className='border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100'>
@@ -38,18 +45,17 @@ const Product = () => {
           {/* Thumbnails */}
           <div className='flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full min-h-[100px]'>
             {productData.image?.map((item, index) => (
-                <img 
-                  src={item}
-                  key={index}
-                  className={`w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer border-2
-                    ${mainImage === item ? 'border-blue-500' : 'border-transparent'}`}
-                  alt={`Thumbnail ${index + 1}`}
-                  onClick={() => setMainImage(item)}
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    console.error('Failed to load image:', item);
-                  }}
-                />
+              <img 
+                key={index}
+                src={item}
+                alt={`Thumbnail ${index + 1}`}
+                className={`w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer border-2 ${mainImage === item ? 'border-blue-500' : 'border-transparent'}`}
+                onClick={() => setMainImage(item)}
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  console.error('Failed to load image:', item);
+                }}
+              />
             ))}
           </div>
 

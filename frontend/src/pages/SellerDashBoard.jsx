@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+// /src/pages/SellerDashBoard.jsx
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { db } from '../firebase';
-import { collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp, onSnapshot } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import app from '../firebase';
+import ProductItem from '../components/ProductItem';
+import BumpListing from '../components/BumpListing';
 
 const auth = getAuth(app);
 
@@ -21,6 +24,7 @@ const SellerDashboard = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [myProducts, setMyProducts] = useState([]);
 
   // Upload a single image to Cloudinary
   const uploadImageToCloudinary = async (file) => {
@@ -107,6 +111,22 @@ const SellerDashboard = () => {
     }
     setUploading(false);
   };
+
+  // Fetch seller's active listings
+  useEffect(() => {
+    const sellerId = auth.currentUser ? auth.currentUser.uid : null;
+    if (sellerId) {
+      const q = query(
+        collection(db, "products"),
+        where("sellerId", "==", sellerId),
+        where("expiryDate", ">", new Date())
+      );
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        setMyProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      });
+      return () => unsubscribe();
+    }
+  }, []);
 
   return (
     <div className="max-w-2xl mx-auto my-8 p-4">
@@ -215,12 +235,10 @@ const SellerDashboard = () => {
             {files.length > 0 && `${files.length} file(s) selected`}
           </div>
         </div>
-
         {/* Status Messages */}
         {uploading && <div className="text-sm text-blue-600">Uploading images...</div>}
         {error && <div className="text-red-600 text-sm mt-2">{error}</div>}
         {success && <div className="text-green-600 text-sm mt-2">{success}</div>}
-
         {/* Submit Button */}
         <button
           type="submit"
@@ -230,6 +248,26 @@ const SellerDashboard = () => {
           {uploading ? 'Uploading...' : 'Upload Product'}
         </button>
       </form>
+
+      {/* My Listings Section */}
+      <div className="mt-10">
+        <h2 className="text-2xl font-bold mb-4">My Listings</h2>
+        {myProducts.length === 0 ? (
+          <p>No active listings.</p>
+        ) : (
+          myProducts.map(product => (
+            <div key={product.id} className="border p-4 my-4 rounded">
+              <ProductItem
+                id={product.id}
+                image={product.image}
+                name={product.name}
+                price={product.price}
+              />
+              <BumpListing productId={product.id} />
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 };

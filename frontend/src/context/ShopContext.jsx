@@ -1,5 +1,6 @@
+// /src/context/ShopContext.jsx
 import { createContext, useState, useEffect } from "react";
-import { collection, query, where, onSnapshot, doc, setDoc } from "firebase/firestore";
+import { collection, query, where, onSnapshot, doc, setDoc, orderBy } from "firebase/firestore";
 import { db } from "../firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
@@ -84,22 +85,29 @@ const ShopContextProvider = (props) => {
     }
   };
 
-  // --- Firestore queries for products with expiry filter ---
+  // --- Firestore queries for products with expiry filter and bump ordering ---
   useEffect(() => {
     const currentDate = new Date();
+
+    // For new products, order first by bump value (desc) then by listDate (desc)
     const qNew = query(
       collection(db, "products"),
       where("type", "==", "new"),
-      where("expiryDate", ">", currentDate)
+      where("expiryDate", ">", currentDate),
+      orderBy("bump", "desc"),
+      orderBy("listDate", "desc")
     );
     const unsubNew = onSnapshot(qNew, (snapshot) => {
       setProducts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
     });
 
+    // For refurbished products, similarly order by bump value and then listDate
     const qRefurb = query(
       collection(db, "products"),
       where("type", "==", "refurbished"),
-      where("expiryDate", ">", currentDate)
+      where("expiryDate", ">", currentDate),
+      orderBy("bump", "desc"),
+      orderBy("listDate", "desc")
     );
     const unsubRefurb = onSnapshot(qRefurb, (snapshot) => {
       setRefurbishedProducts(

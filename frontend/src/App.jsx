@@ -9,8 +9,10 @@ import Cart from './pages/Cart';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Orders from './pages/Orders';
-import Profile from './pages/Profile';  // New Profile page
+import Profile from './pages/Profile';
 import SellerDashboard from './pages/SellerDashBoard';
+import SellerProfile from './pages/SellerProfile';
+import FollowingListings from './pages/FollowingListings';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import SearchBar from './components/SearchBar';
@@ -33,6 +35,8 @@ const App = () => {
         <Route path='/profile' element={<Profile />} />
         <Route path='/orders' element={<Orders />} />
         <Route path='/seller-dashboard' element={<SellerDashboard />} />
+        <Route path='/seller/:sellerId' element={<SellerProfile />} />
+        <Route path='/following-listings' element={<FollowingListings />} />
       </Routes>
       <Footer />
     </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { ShopContext } from "../context/ShopContext";
@@ -14,14 +14,12 @@ const Product = () => {
     const fetchProduct = async () => {
       const docRef = doc(db, "products", productId);
       const docSnap = await getDoc(docRef);
-
       if (docSnap.exists()) {
         setProductData({ id: docSnap.id, ...docSnap.data() });
       } else {
         console.log("No such document!");
       }
     };
-
     fetchProduct();
   }, [productId]);
 
@@ -95,7 +93,13 @@ const Product = () => {
           </p>
           <p className="mb-2">
             <span className="font-semibold">Seller:</span>{" "}
-            {productData.sellerName || "Unknown"}
+            {productData.sellerName && productData.sellerId ? (
+              <Link to={`/seller/${productData.sellerId}`} className="text-blue-600 hover:underline">
+                {productData.sellerName}
+              </Link>
+            ) : (
+              "Unknown"
+            )}
           </p>
           <button
             onClick={() => addToCart(productData)}

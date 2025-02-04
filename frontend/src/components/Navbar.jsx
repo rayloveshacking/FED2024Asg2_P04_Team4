@@ -1,4 +1,3 @@
-// /src/components/Navbar.jsx
 import React, { useContext, useState, useEffect } from 'react';
 import { onAuthStateChanged, getAuth, signOut } from 'firebase/auth';
 import { assets } from '../assets/assets';
@@ -12,7 +11,6 @@ const Navbar = () => {
   const [visible, setVisible] = useState(false);
   const { setShowSearch } = useContext(ShopContext);
   const [user, setUser] = useState(null);
-  // New state for user role
   const [userRole, setUserRole] = useState(null);
   const auth = getAuth(app);
 
@@ -23,7 +21,6 @@ const Navbar = () => {
     return () => unsubscribe();
   }, [auth]);
 
-  // Fetch the user role from Firestore when user changes
   useEffect(() => {
     if (user) {
       const fetchUserRole = async () => {
@@ -65,6 +62,10 @@ const Navbar = () => {
           <p>REFURBISHED</p>
           <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
         </NavLink>
+        <NavLink to='/following-listings' className='flex flex-col items-center gap-1'>
+          <p>FOLLOWING</p>
+          <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
+        </NavLink>
         <NavLink to='/contact' className='flex flex-col items-center gap-1'>
           <p>CONTACT</p>
           <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
@@ -87,7 +88,6 @@ const Navbar = () => {
                   <Link to='/orders' className='cursor-pointer hover:text-black'>
                     Orders
                   </Link>
-                  {/* Only show Seller Dashboard if the user role is 'seller' */}
                   {userRole === 'seller' && (
                     <Link to='/seller-dashboard' className='cursor-pointer hover:text-black'>
                       Seller Dashboard
@@ -131,6 +131,7 @@ const Navbar = () => {
           <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border' to='/'>SHOP</NavLink>
           <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border' to='/new'>NEW</NavLink>
           <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border' to='/refurbished'>REFURBISHED</NavLink>
+          <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border' to='/following-listings'>FOLLOWING</NavLink>
           <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border' to='/contact'>CONTACT</NavLink>
         </div>
       </div>

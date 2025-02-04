@@ -1,9 +1,9 @@
+// /src/pages/Cart.jsx
 import React, { useContext } from "react";
 import { ShopContext } from "../context/ShopContext";
 
 const Cart = () => {
-  const { cart, removeFromCart, updateCartQuantity, currency } =
-    useContext(ShopContext);
+  const { cart, removeFromCart, updateCartQuantity, currency } = useContext(ShopContext);
 
   const totalPrice = cart.reduce(
     (acc, item) => acc + item.price * item.quantity,
@@ -20,6 +20,7 @@ const Cart = () => {
           <table className="w-full border-collapse">
             <thead>
               <tr>
+                <th className="border p-2">Image</th>
                 <th className="border p-2">Product</th>
                 <th className="border p-2">Price</th>
                 <th className="border p-2">Quantity</th>
@@ -30,6 +31,13 @@ const Cart = () => {
             <tbody>
               {cart.map((item) => (
                 <tr key={item.id}>
+                  <td className="border p-2">
+                    <img
+                      src={Array.isArray(item.image) ? item.image[0] : item.image}
+                      alt={item.name}
+                      className="w-16 h-16 object-cover"
+                    />
+                  </td>
                   <td className="border p-2">{item.name}</td>
                   <td className="border p-2">
                     {currency} {item.price}

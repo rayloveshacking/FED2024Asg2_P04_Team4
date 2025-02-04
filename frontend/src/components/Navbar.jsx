@@ -1,14 +1,19 @@
+// /src/components/Navbar.jsx
 import React, { useContext, useState, useEffect } from 'react';
 import { onAuthStateChanged, getAuth, signOut } from 'firebase/auth';
 import { assets } from '../assets/assets';
 import { NavLink, Link } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
 import app from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 const Navbar = () => {
   const [visible, setVisible] = useState(false);
   const { setShowSearch } = useContext(ShopContext);
   const [user, setUser] = useState(null);
+  // New state for user role
+  const [userRole, setUserRole] = useState(null);
   const auth = getAuth(app);
 
   useEffect(() => {
@@ -16,7 +21,23 @@ const Navbar = () => {
       setUser(user);
     });
     return () => unsubscribe();
-  }, []);
+  }, [auth]);
+
+  // Fetch the user role from Firestore when user changes
+  useEffect(() => {
+    if (user) {
+      const fetchUserRole = async () => {
+        const userDocRef = doc(db, 'users', user.uid);
+        const docSnap = await getDoc(userDocRef);
+        if (docSnap.exists()) {
+          setUserRole(docSnap.data().role);
+        }
+      };
+      fetchUserRole();
+    } else {
+      setUserRole(null);
+    }
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -66,9 +87,12 @@ const Navbar = () => {
                   <Link to='/orders' className='cursor-pointer hover:text-black'>
                     Orders
                   </Link>
-                  <Link to='/seller-dashboard' className='cursor-pointer hover:text-black'>
-                    Seller Dashboard
-                  </Link>
+                  {/* Only show Seller Dashboard if the user role is 'seller' */}
+                  {userRole === 'seller' && (
+                    <Link to='/seller-dashboard' className='cursor-pointer hover:text-black'>
+                      Seller Dashboard
+                    </Link>
+                  )}
                   <p
                     className='cursor-pointer hover:text-black'
                     onClick={handleLogout}

@@ -1,4 +1,3 @@
-// /src/pages/SellerProfile.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
@@ -23,9 +22,13 @@ const SellerProfile = () => {
     fetchSeller();
   }, [sellerId]);
 
-  // Fetch the seller's product listings from the "products" collection
+  // Fetch the seller's product listings (only non-expired listings)
   useEffect(() => {
-    const q = query(collection(db, "products"), where("sellerId", "==", sellerId));
+    const q = query(
+      collection(db, "products"),
+      where("sellerId", "==", sellerId),
+      where("expiryDate", ">", new Date())
+    );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });

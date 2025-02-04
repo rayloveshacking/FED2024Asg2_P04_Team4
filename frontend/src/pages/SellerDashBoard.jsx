@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { db } from '../firebase';
-import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import app from '../firebase';
 
@@ -37,12 +37,13 @@ const SellerDashboard = () => {
     }
   };
 
-  // Check active listings count
+  // Check active listings count (only count listings that have not yet expired)
   const checkActiveListingsLimit = async () => {
     const q = query(
       collection(db, 'products'),
       where('sellerId', '==', auth.currentUser.uid),
-      where('active', '==', true)
+      where('active', '==', true),
+      where('expiryDate', '>', new Date())
     );
     const snapshot = await getDocs(q);
     return snapshot.size;
@@ -60,7 +61,7 @@ const SellerDashboard = () => {
     setUploading(true);
 
     try {
-      // Enforce active listings limit of 30
+      // Enforce active listings limit of 30 (only count non-expired listings)
       const activeCount = await checkActiveListingsLimit();
       if (activeCount >= 30) {
         throw new Error("You have reached the maximum of 30 active listings.");
@@ -71,6 +72,8 @@ const SellerDashboard = () => {
       }
 
       const uploadedUrls = await Promise.all(files.map(file => uploadImageToCloudinary(file)));
+      const now = new Date();
+      const expiryDate = Timestamp.fromDate(new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)); // 30 days later
 
       const newProduct = {
         ...product,
@@ -80,6 +83,8 @@ const SellerDashboard = () => {
         sellerName: auth.currentUser.displayName || '',
         active: true,       // Mark listing as active
         bump: 0,            // Default bump value
+        listDate: Timestamp.fromDate(now),
+        expiryDate: expiryDate,
         createdAt: serverTimestamp()
       };
 

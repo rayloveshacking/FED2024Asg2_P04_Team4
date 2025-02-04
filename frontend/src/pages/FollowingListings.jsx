@@ -1,4 +1,3 @@
-// /src/pages/FollowingListings.jsx
 import React, { useEffect, useState } from 'react';
 import { getAuth } from 'firebase/auth';
 import { doc, getDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
@@ -30,7 +29,8 @@ const FollowingListings = () => {
       // Firestore 'in' queries support up to 10 values. If you have more, you may need to adjust.
       const q = query(
         collection(db, "products"),
-        where("sellerId", "in", following.slice(0, 10))
+        where("sellerId", "in", following.slice(0, 10)),
+        where("expiryDate", ">", new Date())
       );
       const unsubscribe = onSnapshot(q, (snapshot) => {
         setListings(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));

@@ -84,16 +84,22 @@ const ShopContextProvider = (props) => {
     }
   };
 
-  // --- Firestore queries for products ---
+  // --- Firestore queries for products with expiry filter ---
   useEffect(() => {
-    const qNew = query(collection(db, "products"), where("type", "==", "new"));
+    const currentDate = new Date();
+    const qNew = query(
+      collection(db, "products"),
+      where("type", "==", "new"),
+      where("expiryDate", ">", currentDate)
+    );
     const unsubNew = onSnapshot(qNew, (snapshot) => {
       setProducts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
     });
 
     const qRefurb = query(
       collection(db, "products"),
-      where("type", "==", "refurbished")
+      where("type", "==", "refurbished"),
+      where("expiryDate", ">", currentDate)
     );
     const unsubRefurb = onSnapshot(qRefurb, (snapshot) => {
       setRefurbishedProducts(

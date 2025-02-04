@@ -1,4 +1,3 @@
-// /src/context/ShopContext.jsx
 import { createContext, useState, useEffect } from "react";
 import { collection, query, where, onSnapshot, doc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
@@ -19,24 +18,21 @@ const ShopContextProvider = (props) => {
   const [currentUser, setCurrentUser] = useState(null);
   const auth = getAuth();
 
-  // Listen for authentication changes
+  // Listen for authentication changes and load user's cart
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
       if (user) {
-        // Listen to the cart document for the logged-in user
         const cartDocRef = doc(db, "carts", user.uid);
         const unsubscribeCart = onSnapshot(cartDocRef, (docSnap) => {
           if (docSnap.exists()) {
             setCart(docSnap.data().items);
           } else {
-            // If no cart document exists, initialize with an empty cart
             setCart([]);
           }
         });
         return () => unsubscribeCart();
       } else {
-        // When logged out, clear the cart
         setCart([]);
       }
     });
@@ -51,7 +47,6 @@ const ShopContextProvider = (props) => {
     }
   };
 
-  // Update addToCart to update both local state and Firestore
   const addToCart = async (product) => {
     const existingProduct = cart.find((item) => item.id === product.id);
     let newCart;
@@ -66,20 +61,27 @@ const ShopContextProvider = (props) => {
     await updateCartInFirestore(newCart);
   };
 
-  // Update removeFromCart to update both local state and Firestore
   const removeFromCart = async (productId) => {
     const newCart = cart.filter((item) => item.id !== productId);
     setCart(newCart);
     await updateCartInFirestore(newCart);
   };
 
-  // Update updateCartQuantity to update both local state and Firestore
   const updateCartQuantity = async (productId, quantity) => {
     const newCart = cart.map((item) =>
       item.id === productId ? { ...item, quantity } : item
     );
     setCart(newCart);
     await updateCartInFirestore(newCart);
+  };
+
+  // New clearCart function to remove all items after checkout
+  const clearCart = async () => {
+    setCart([]);
+    if (currentUser) {
+      const cartDocRef = doc(db, "carts", currentUser.uid);
+      await setDoc(cartDocRef, { items: [] });
+    }
   };
 
   // --- Firestore queries for products ---
@@ -118,6 +120,7 @@ const ShopContextProvider = (props) => {
     addToCart,
     removeFromCart,
     updateCartQuantity,
+    clearCart,
   };
 
   return (

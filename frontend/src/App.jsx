@@ -8,7 +8,6 @@ import Product from './pages/Product';
 import Cart from './pages/Cart';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import PlaceOrder from './pages/PlaceOrder';
 import Orders from './pages/Orders';
 import Profile from './pages/Profile';  // New Profile page
 import SellerDashboard from './pages/SellerDashBoard';
@@ -32,7 +31,6 @@ const App = () => {
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
         <Route path='/profile' element={<Profile />} />
-        <Route path='/place-order' element={<PlaceOrder />} />
         <Route path='/orders' element={<Orders />} />
         <Route path='/seller-dashboard' element={<SellerDashboard />} />
       </Routes>

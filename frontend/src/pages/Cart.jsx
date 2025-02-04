@@ -1,9 +1,10 @@
-// /src/pages/Cart.jsx
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { ShopContext } from "../context/ShopContext";
+import CheckoutModal from "../components/CheckoutModal";
 
 const Cart = () => {
-  const { cart, removeFromCart, updateCartQuantity, currency } = useContext(ShopContext);
+  const { cart, removeFromCart, updateCartQuantity, currency, clearCart } = useContext(ShopContext);
+  const [showCheckout, setShowCheckout] = useState(false);
 
   const totalPrice = cart.reduce(
     (acc, item) => acc + item.price * item.quantity,
@@ -72,8 +73,22 @@ const Cart = () => {
             <p className="text-xl font-bold">
               Total: {currency} {totalPrice}
             </p>
+            <button
+              onClick={() => setShowCheckout(true)}
+              className="mt-4 bg-green-600 text-white py-2 px-4 rounded"
+            >
+              Checkout
+            </button>
           </div>
         </div>
+      )}
+      {showCheckout && (
+        <CheckoutModal
+          cart={cart}
+          totalPrice={totalPrice}
+          onClose={() => setShowCheckout(false)}
+          clearCart={clearCart}
+        />
       )}
     </div>
   );

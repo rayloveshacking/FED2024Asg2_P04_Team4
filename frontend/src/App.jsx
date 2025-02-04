@@ -13,6 +13,7 @@ import Profile from './pages/Profile';
 import SellerDashboard from './pages/SellerDashBoard';
 import SellerProfile from './pages/SellerProfile';
 import FollowingListings from './pages/FollowingListings';
+import SavedListings from './pages/SavedListings';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import SearchBar from './components/SearchBar';
@@ -37,6 +38,7 @@ const App = () => {
         <Route path='/seller-dashboard' element={<SellerDashboard />} />
         <Route path='/seller/:sellerId' element={<SellerProfile />} />
         <Route path='/following-listings' element={<FollowingListings />} />
+        <Route path='/saved-listings' element={<SavedListings />} />
       </Routes>
       <Footer />
     </div>

@@ -49,7 +49,8 @@ const Navbar = () => {
       <Link to={'/'}>
         <img src={assets.logo} className='w-36' alt="" />
       </Link>
-      <ul className='hidden sm:flex gap-5 text-sm text-gray-700'>
+      {/* Updated nav links */}
+      <ul className='hidden sm:flex gap-12 text-sm text-gray-700 font-sans'>
         <NavLink to='/' className='flex flex-col items-center gap-1'>
           <p>SHOP</p>
           <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
@@ -68,6 +69,11 @@ const Navbar = () => {
         </NavLink>
         <NavLink to='/contact' className='flex flex-col items-center gap-1'>
           <p>CONTACT</p>
+          <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
+        </NavLink>
+        {/* New Saved Listings Link */}
+        <NavLink to='/saved-listings' className='flex flex-col items-center gap-1'>
+          <p>SAVED</p>
           <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
         </NavLink>
       </ul>
@@ -133,6 +139,7 @@ const Navbar = () => {
           <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border' to='/refurbished'>REFURBISHED</NavLink>
           <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border' to='/following-listings'>FOLLOWING</NavLink>
           <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border' to='/contact'>CONTACT</NavLink>
+          <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border' to='/saved-listings'>SAVED</NavLink>
         </div>
       </div>
     </div>

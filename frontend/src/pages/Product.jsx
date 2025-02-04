@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { ShopContext } from "../context/ShopContext";
+import SaveListingButton from '../components/SaveListingButton';
 
 const Product = () => {
   const { productId } = useParams();
@@ -107,6 +108,10 @@ const Product = () => {
           >
             Add to Cart
           </button>
+          {/* Save Listing Button */}
+          <div className="mt-2">
+            <SaveListingButton productId={productData.id} />
+          </div>
         </div>
       </div>
     </div>

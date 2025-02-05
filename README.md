@@ -43,7 +43,7 @@ For design mockups and wireframes, please visit our [Figma URL](https://www.figm
 - [Firebase](https://firebase.google.com)  
   Used for authentication, real-time database (Firestore), and hosting features.
 
--[Cloudinary](https://cloudinary.com/)
+- [Cloudinary](https://cloudinary.com/)
   Used for storing images and retrieving them accordingly.
   
 - [Tailwind CSS](https://tailwindcss.com)  

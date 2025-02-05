@@ -24,9 +24,9 @@ For design mockups and wireframes, please visit our [Figma URL](https://www.figm
 - **Promotional Bumping:** Sellers can bump listings to increase visibility.
 - **Real-time Cart & Order Management:** Using Firebase for real-time updates, users can manage their cart and track orders.
 - **Lottie Animations:** Engaging animations for events like account creation and homepage visuals.
--**Following Between Users:** Users can follow sellers and see their latest listings as well as their specific listings.
--**Create Listings:** Sellers can upload their products using our seller dashboard to easily sell their products.
--**Active Listings:** Listings wil automatically become inactive after 30 days so that the website is clean.
+- **Following Between Users:** Users can follow sellers and see their latest listings as well as their specific listings.
+- **Create Listings:** Sellers can upload their products using our seller dashboard to easily sell their products.
+- **Active Listings:** Listings wil automatically become inactive after 30 days so that the website is clean.
 
 
 ### Features Left to Implement

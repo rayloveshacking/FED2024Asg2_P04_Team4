@@ -4,18 +4,22 @@ import { Link, useNavigate } from 'react-router-dom';
 import app from '../firebase';
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from '../firebase';
+import Lottie from 'lottie-react';
+import successAnimation from '../assets/animations/success.json';
 
 const Register = () => {
   const [name, setName] = useState(''); // New field for user's name
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showAnimation, setShowAnimation] = useState(false);
   const navigate = useNavigate();
   const auth = getAuth(app);
   const [role, setRole] = useState('customer');
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setError('');
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
@@ -29,11 +33,24 @@ const Register = () => {
         role,
         createdAt: serverTimestamp()
       });
-      navigate(role === 'seller' ? '/seller-dashboard' : '/');
+      // Show success animation before navigating
+      setShowAnimation(true);
+      setTimeout(() => {
+        navigate(role === 'seller' ? '/seller-dashboard' : '/');
+      }, 2000);
     } catch (error) {
       setError(error.message);
     }
   };
+
+  if (showAnimation) {
+    return (
+      <div className="max-w-md mx-auto my-8 p-4 flex flex-col items-center">
+        <Lottie animationData={successAnimation} style={{ height: 200, width: 200 }} />
+        <h2 className="text-2xl font-bold mt-4">Account Created Successfully!</h2>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md mx-auto my-8 p-4">

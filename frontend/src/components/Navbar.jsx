@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { onAuthStateChanged, getAuth, signOut } from 'firebase/auth';
 import { assets } from '../assets/assets';
 import { NavLink, Link } from 'react-router-dom';
@@ -12,8 +12,11 @@ const Navbar = () => {
   const { setShowSearch } = useContext(ShopContext);
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const profileRef = useRef(null);
   const auth = getAuth(app);
 
+  // Listen for authentication changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
@@ -21,6 +24,7 @@ const Navbar = () => {
     return () => unsubscribe();
   }, [auth]);
 
+  // Fetch user role if logged in
   useEffect(() => {
     if (user) {
       const fetchUserRole = async () => {
@@ -39,41 +43,52 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      setProfileMenuOpen(false);
     } catch (error) {
       console.error('Logout error:', error);
     }
   };
 
+  // Close the profile dropdown if click is outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setProfileMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [profileRef]);
+
   return (
     <div className='flex items-center justify-between py-5 font-medium'>
       <Link to={'/'}>
-        <img src={assets.logo} className='w-36' alt="" />
+        <img src={assets.logo} className='w-36' alt="Logo" />
       </Link>
-      {/* Updated nav links */}
+      {/* Nav links with bold text */}
       <ul className='hidden sm:flex gap-12 text-sm text-gray-700 font-sans'>
         <NavLink to='/' className='flex flex-col items-center gap-1'>
-          <p>SHOP</p>
+          <p className="font-bold">SHOP</p>
           <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
         </NavLink>
         <NavLink to='/new' className='flex flex-col items-center gap-1'>
-          <p>NEW</p>
+          <p className="font-bold">NEW</p>
           <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
         </NavLink>
         <NavLink to='/refurbished' className='flex flex-col items-center gap-1'>
-          <p>REFURBISHED</p>
+          <p className="font-bold">REFURBISHED</p>
           <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
         </NavLink>
         <NavLink to='/following-listings' className='flex flex-col items-center gap-1'>
-          <p>FOLLOWING</p>
+          <p className="font-bold">FOLLOWING</p>
           <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
         </NavLink>
         <NavLink to='/contact' className='flex flex-col items-center gap-1'>
-          <p>CONTACT</p>
+          <p className="font-bold">CONTACT</p>
           <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
         </NavLink>
-        {/* New Saved Listings Link */}
         <NavLink to='/saved-listings' className='flex flex-col items-center gap-1'>
-          <p>SAVED</p>
+          <p className="font-bold">SAVED</p>
           <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
         </NavLink>
       </ul>
@@ -82,40 +97,42 @@ const Navbar = () => {
           onClick={() => setShowSearch(true)}
           src={assets.search_icon}
           className='w-5 cursor-pointer'
-          alt=""
+          alt="Search"
         />
-        <div className='group relative'>
-          <img className='w-5 cursor-pointer' src={assets.profile_icon} alt="" />
-          <div className='group-hover:block hidden absolute dropdown-menu right-0 pt-4'>
-            <div className='flex flex-col gap-2 w-36 px-5 bg-slate-100 text-gray-500 rounded'>
-              {user ? (
-                <>
-                  <Link to="/profile" className="cursor-pointer hover:text-black">My Profile</Link>
-                  <Link to='/orders' className='cursor-pointer hover:text-black'>
-                    Orders
-                  </Link>
-                  {userRole === 'seller' && (
-                    <Link to='/seller-dashboard' className='cursor-pointer hover:text-black'>
-                      Seller Dashboard
-                    </Link>
-                  )}
-                  <p
-                    className='cursor-pointer hover:text-black'
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </p>
-                </>
-              ) : (
-                <Link to='/login' className='cursor-pointer hover:text-black'>
-                  Login
-                </Link>
-              )}
+        {/* Profile Icon with click-toggle dropdown */}
+        <div ref={profileRef} className='relative'>
+          <img
+            onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+            className='w-5 cursor-pointer'
+            src={assets.profile_icon}
+            alt="Profile"
+          />
+          {profileMenuOpen && (
+            <div className='absolute right-0 top-full mt-2 z-10'>
+              <div className='flex flex-col gap-2 w-36 px-5 py-3 bg-slate-100 text-gray-500 rounded shadow'>
+                {user ? (
+                  <>
+                    <Link onClick={() => setProfileMenuOpen(false)} to="/profile" className="cursor-pointer hover:text-black">My Profile</Link>
+                    <Link onClick={() => setProfileMenuOpen(false)} to='/orders' className='cursor-pointer hover:text-black'>Orders</Link>
+                    {userRole === 'seller' && (
+                      <Link onClick={() => setProfileMenuOpen(false)} to='/seller-dashboard' className='cursor-pointer hover:text-black'>Seller Dashboard</Link>
+                    )}
+                    <p
+                      className='cursor-pointer hover:text-black'
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </p>
+                  </>
+                ) : (
+                  <Link onClick={() => setProfileMenuOpen(false)} to='/login' className='cursor-pointer hover:text-black'>Login</Link>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
         <Link to='/cart' className='relative'>
-          <img src={assets.cart_icon} className='w-5 min-w-5' alt="" />
+          <img src={assets.cart_icon} className='w-5 min-w-5' alt="Cart" />
           <p className='absolute right-[-5px] bottom-[-5px] w-4 text-center leading-4 bg-black text-white aspect-square rounded-full text-[8px]'>
             10
           </p>
@@ -124,22 +141,22 @@ const Navbar = () => {
           onClick={() => setVisible(true)}
           src={assets.menu_icon}
           className='w-5 cursor-pointer sm:hidden'
-          alt=""
+          alt="Menu"
         />
       </div>
-      {/* Sidebar menu for small screens */}
+      {/* Sidebar menu for small screens with bold text */}
       <div className={`absolute top-0 right-0 bottom-0 overflow-hidden bg-white transition-all ${visible ? 'w-full' : 'w-0'}`}>
         <div className='flex flex-col text-gray-600'>
           <div onClick={() => setVisible(false)} className='flex items-center gap-4 p-3 cursor-pointer'>
-            <img className='h-4 rotate-180' src={assets.dropdown_icon} alt='' />
-            <p>Back</p>
+            <img className='h-4 rotate-180' src={assets.dropdown_icon} alt="Back" />
+            <p className="font-bold">Back</p>
           </div>
-          <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border' to='/'>SHOP</NavLink>
-          <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border' to='/new'>NEW</NavLink>
-          <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border' to='/refurbished'>REFURBISHED</NavLink>
-          <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border' to='/following-listings'>FOLLOWING</NavLink>
-          <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border' to='/contact'>CONTACT</NavLink>
-          <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border' to='/saved-listings'>SAVED</NavLink>
+          <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border font-bold' to='/'>SHOP</NavLink>
+          <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border font-bold' to='/new'>NEW</NavLink>
+          <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border font-bold' to='/refurbished'>REFURBISHED</NavLink>
+          <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border font-bold' to='/following-listings'>FOLLOWING</NavLink>
+          <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border font-bold' to='/contact'>CONTACT</NavLink>
+          <NavLink onClick={() => setVisible(false)} className='py-2 -pl-6 border font-bold' to='/saved-listings'>SAVED</NavLink>
         </div>
       </div>
     </div>

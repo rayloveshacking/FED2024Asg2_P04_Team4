@@ -1,6 +1,6 @@
-# MokeSell: Premium Online Store
+# MokeSell: Premium Ecommerce Store
 
-Mokesell is a modern online store that will bring the latest products from brand new arrivals to high quality refurbished products. Built with React and Vite, MokeSell offers a smooth, responsive shopping experience with advanced features such as product bumping, saved listings and real time order tracking. Our mission is to make online shopping both enjoyable and efficient for every user.
+Mokesell is a premium ecommerce online store that will bring the latest products from brand new arrivals to high quality refurbished products. Built with React and Vite, MokeSell offers a smooth, responsive shopping experience with advanced features such as product bumping, saved listings and real time order tracking. Our mission is to make online shopping both enjoyable and efficient for every user.
 
 ## Design Process
 
@@ -112,5 +112,5 @@ During testing, we discovered minor layout issues on smaller screens, which have
 - Special thanks to Bhaveesh for his insights and support.
 - Inspired by various e-commerce sites and best practices in UI/UX design.
 
-## View our website:
+## Visit our website:
 -[MokeSell](https://rayloveshacking.github.io/FED2024Asg2_P04_Team4/)

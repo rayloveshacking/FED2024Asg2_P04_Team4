@@ -1,5 +1,5 @@
 // /src/pages/SellerDashBoard.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; //import react and other necessary components.
 import axios from 'axios';
 import { db } from '../firebase';
 import { collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp, onSnapshot } from 'firebase/firestore';
@@ -8,10 +8,10 @@ import app from '../firebase';
 import ProductItem from '../components/ProductItem';
 import BumpListing from '../components/BumpListing';
 
-const auth = getAuth(app);
+const auth = getAuth(app); //This initializes firebase auth using the app configuration.
 
 const SellerDashboard = () => {
-  const [product, setProduct] = useState({
+  const [product, setProduct] = useState({ //This is a state to hold the product details being uploaded, it contain fields.
     name: '',
     price: '',
     description: '',
@@ -20,23 +20,23 @@ const SellerDashboard = () => {
     type: 'new',
     image: [] // Cloudinary image URLs
   });
-  const [files, setFiles] = useState([]);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [uploading, setUploading] = useState(false);
-  const [myProducts, setMyProducts] = useState([]);
+  const [files, setFiles] = useState([]); //This is a state to hold the selected file objects.
+  const [error, setError] = useState(''); //This is the state to store any error messages during the upload process.
+  const [success, setSuccess] = useState(''); //This is the state to store success messages.
+  const [uploading, setUploading] = useState(false); //This is the state to indicate whether an image upload is in progree or not.
+  const [myProducts, setMyProducts] = useState([]); //This is the state to hold the seller's active product listings.
 
   // Upload a single image to Cloudinary
   const uploadImageToCloudinary = async (file) => {
     const data = new FormData();
-    data.append('file', file);
+    data.append('file', file); //This append the file and required cloudinary parameters.
     data.append('upload_preset', 'unsigned_preset'); // your preset
     data.append('cloud_name', 'dls2ndk2q'); // your cloud name
     try {
       const res = await axios.post(`https://api.cloudinary.com/v1_1/dls2ndk2q/image/upload`, data);
       return res.data.secure_url;
     } catch (err) {
-      console.error('Cloudinary upload error:', err);
+      console.error('Cloudinary upload error:', err); //This log and rethrow any errors during upload.
       throw err;
     }
   };
@@ -53,16 +53,16 @@ const SellerDashboard = () => {
     return snapshot.size;
   };
 
-  const handleFilesChange = (e) => {
+  const handleFilesChange = (e) => { //This is the event handler for the file input change, it converts the filelist object in to an array and update the state.
     const selectedFiles = Array.from(e.target.files);
     setFiles(selectedFiles);
   };
 
-  const handleUpload = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-    setUploading(true);
+  const handleUpload = async (e) => { //This is a function to handle the form submission for uploading a product.
+    e.preventDefault(); //To prevent default form submission.
+    setError(''); //To clear any existing errors.
+    setSuccess(''); //To clear any existing success messages
+    setUploading(true); //To indicate that the upload process is in progress.
 
     try {
       // Enforce active listings limit of 30 (only count non-expired listings)
@@ -71,15 +71,15 @@ const SellerDashboard = () => {
         throw new Error("You have reached the maximum of 30 active listings.");
       }
 
-      if (!files.length) {
+      if (!files.length) { //If no files are selected, throw an error.
         throw new Error("Please upload at least one image.");
       }
 
-      const uploadedUrls = await Promise.all(files.map(file => uploadImageToCloudinary(file)));
-      const now = new Date();
+      const uploadedUrls = await Promise.all(files.map(file => uploadImageToCloudinary(file))); //This upload all selected files to cloudinary.
+      const now = new Date(); //Get the currnt date time.
       const expiryDate = Timestamp.fromDate(new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)); // 30 days later
 
-      const newProduct = {
+      const newProduct = { //Create a new product object combining form data and additional meta data.
         ...product,
         image: uploadedUrls,
         price: Number(product.price),
@@ -92,7 +92,7 @@ const SellerDashboard = () => {
         createdAt: serverTimestamp()
       };
 
-      await addDoc(collection(db, 'products'), newProduct);
+      await addDoc(collection(db, 'products'), newProduct); //Add the new product document to the products collection.
 
       setSuccess("Product uploaded successfully!");
       setProduct({
@@ -104,9 +104,9 @@ const SellerDashboard = () => {
         type: 'new',
         image: []
       });
-      setFiles([]);
+      setFiles([]); //Clear the selected files.
     } catch (err) {
-      console.error("Error uploading product:", err);
+      console.error("Error uploading product:", err); //Log any errors that occur during upload process.
       setError(err.message);
     }
     setUploading(false);
@@ -114,19 +114,19 @@ const SellerDashboard = () => {
 
   // Fetch seller's active listings
   useEffect(() => {
-    const sellerId = auth.currentUser ? auth.currentUser.uid : null;
+    const sellerId = auth.currentUser ? auth.currentUser.uid : null; //This get the seller's id from the current user.
     if (sellerId) {
-      const q = query(
+      const q = query( //This create a firestore query to get products belonging to the seller that is not expired.
         collection(db, "products"),
         where("sellerId", "==", sellerId),
         where("expiryDate", ">", new Date())
       );
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        setMyProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const unsubscribe = onSnapshot(q, (snapshot) => { //This set up a real time listener for the query.
+        setMyProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))); //This update the myProducts state with the retrieved products.
       });
-      return () => unsubscribe();
+      return () => unsubscribe(); //This clean up the listener when the component unmounts.
     }
-  }, []);
+  }, []); //Empty the array to run this effect once on mount.
 
   return (
     <div className="max-w-2xl mx-auto my-8 p-4">

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; //Import react and all other components to have all of the routes.
 import { Routes, Route } from 'react-router-dom';
 import Shop from './pages/Shop';
 import New from './pages/New';
@@ -18,7 +18,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import SearchBar from './components/SearchBar';
 
-const App = () => {
+const App = () => { //The root component that defines the overall structure and routing of the application.
   return (
     <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
       <Navbar />

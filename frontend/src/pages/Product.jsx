@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react"; //import react and other necessary components
 import { useParams, Link } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
@@ -6,25 +6,25 @@ import { ShopContext } from "../context/ShopContext";
 import SaveListingButton from '../components/SaveListingButton';
 
 const Product = () => {
-  const { productId } = useParams();
-  const [productData, setProductData] = useState(null);
-  const [mainImage, setMainImage] = useState("");
-  const { addToCart, currency } = useContext(ShopContext);
+  const { productId } = useParams(); // Extract the productId from the URL using useParams.
+  const [productData, setProductData] = useState(null); // This is a local state to hold the fetched product data.
+  const [mainImage, setMainImage] = useState(""); //This is a local state to hold the currently displayed main image.
+  const { addToCart, currency } = useContext(ShopContext); //This will destructure the addToCart function and currency value from the global shopcontext.
 
-  useEffect(() => {
+  useEffect(() => { //This useEffect fetch product data from Firestore when the component mounts or productId changes.
     const fetchProduct = async () => {
-      const docRef = doc(db, "products", productId);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
+      const docRef = doc(db, "products", productId); //This will get a reference to the product document in firestore using product id.
+      const docSnap = await getDoc(docRef); //This will fetch the document snapshot.
+      if (docSnap.exists()) { // If the document exists, update productData state with it's data.
         setProductData({ id: docSnap.id, ...docSnap.data() });
       } else {
         console.log("No such document!");
       }
     };
-    fetchProduct();
+    fetchProduct(); //This is a function call to fetch the product.
   }, [productId]);
 
-  useEffect(() => {
+  useEffect(() => { // This useEffect set the main image once productData is loaded and check if productData is available.
     if (
       productData &&
       productData.image &&
@@ -35,7 +35,7 @@ const Product = () => {
     }
   }, [productData, mainImage]);
 
-  return productData ? (
+  return productData ? ( //Render the component based on whether productData is available.
     <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100">
       <div className="flex flex-col sm:flex-row gap-12 sm:gap-12">
         {/* Image Gallery Section */}

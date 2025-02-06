@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; //import react and other necessary components
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { Link, useNavigate } from 'react-router-dom';
 import app from '../firebase';
@@ -8,17 +8,17 @@ import Lottie from 'lottie-react';
 import successAnimation from '../assets/animations/success.json';
 
 const Register = () => {
-  const [name, setName] = useState(''); // New field for user's name
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [showAnimation, setShowAnimation] = useState(false);
-  const navigate = useNavigate();
+  const [name, setName] = useState(''); // State variable for storing the user's name
+  const [email, setEmail] = useState(''); //State variable for storing the user's email
+  const [password, setPassword] = useState(''); //State variable for storing the user's password.
+  const [error, setError] = useState(''); // State variable for storing any error messages during registration.
+  const [showAnimation, setShowAnimation] = useState(false); //State variable to control whether the success animation should be displayed.
+  const navigate = useNavigate(); //This is a hook to allow programatic navigation after registration.
   const auth = getAuth(app);
   const [role, setRole] = useState('customer');
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
+  const handleRegister = async (e) => { //This is an asynchronous function to handle the registration process when the form is submitted.
+    e.preventDefault(); //To prevent the default form submission.
     setError('');
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);

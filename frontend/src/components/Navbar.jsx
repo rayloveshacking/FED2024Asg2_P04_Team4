@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react'; //import react and all necessary components.
 import { onAuthStateChanged, getAuth, signOut } from 'firebase/auth';
 import { assets } from '../assets/assets';
 import { NavLink, Link } from 'react-router-dom';
@@ -7,43 +7,43 @@ import app from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
-const Navbar = () => {
-  const [visible, setVisible] = useState(false);
-  const { setShowSearch } = useContext(ShopContext);
-  const [user, setUser] = useState(null);
-  const [userRole, setUserRole] = useState(null);
-  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-  const profileRef = useRef(null);
-  const auth = getAuth(app);
+const Navbar = () => { 
+  const [visible, setVisible] = useState(false); //This is the state to control the visibility of the side bar menu for small screens.
+  const { setShowSearch } = useContext(ShopContext); //This is to retrieve the function to show or hide the search bar from the global context.
+  const [user, setUser] = useState(null); //This is the state to store the current authenticated user.
+  const [userRole, setUserRole] = useState(null); //This is the state to store the user's role
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false); //This is the state to control whether the profile drop down is open or not.
+  const profileRef = useRef(null); //This is to create a ref to the profile drop down container to detect clicks outside.
+  const auth = getAuth(app); //This will initialize firebase auth using the app instance.
 
   // Listen for authentication changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
     });
-    return () => unsubscribe();
+    return () => unsubscribe(); //C;ean up the listener when the component unmounts.
   }, [auth]);
 
   // Fetch user role if logged in
   useEffect(() => {
     if (user) {
       const fetchUserRole = async () => {
-        const userDocRef = doc(db, 'users', user.uid);
-        const docSnap = await getDoc(userDocRef);
-        if (docSnap.exists()) {
+        const userDocRef = doc(db, 'users', user.uid); //This is to get a reference to the user's document in firestore.
+        const docSnap = await getDoc(userDocRef); //This is to retrieve the document snapshot.
+        if (docSnap.exists()) { //If the document exists, set the user's role.
           setUserRole(docSnap.data().role);
         }
       };
       fetchUserRole();
     } else {
-      setUserRole(null);
+      setUserRole(null); //If no user is authenticated, reset the role to null.
     }
   }, [user]);
 
-  const handleLogout = async () => {
+  const handleLogout = async () => { //This is the function to handle user logout.
     try {
-      await signOut(auth);
-      setProfileMenuOpen(false);
+      await signOut(auth); //This is to signout the user using firebase auth.
+      setProfileMenuOpen(false); //This is to close the profile dropdown after logging out.
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -52,15 +52,15 @@ const Navbar = () => {
   // Close the profile dropdown if click is outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
+      if (profileRef.current && !profileRef.current.contains(event.target)) { //This will check if the click target is outside the profileRef container.
         setProfileMenuOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside); //This is to listen the mousedown events on the document.
+    return () => document.removeEventListener('mousedown', handleClickOutside); //This is to clean up the event listener when the component unmounts.
   }, [profileRef]);
 
-  return (
+  return ( //Navbar container with flex layout to arrange items horizontally.
     <div className='flex items-center justify-between py-5 font-medium'>
       <Link to={'/'}>
         <img src={assets.logo} className='w-36' alt="Logo" />

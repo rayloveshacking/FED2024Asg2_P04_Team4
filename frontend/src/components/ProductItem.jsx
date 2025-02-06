@@ -1,5 +1,5 @@
 // /src/components/ProductItem.jsx
-import React, { useContext } from 'react';
+import React, { useContext } from 'react'; //import react and other necessary components.
 import { ShopContext } from '../context/ShopContext';
 import { Link } from 'react-router-dom';
 import SaveListingButton from './SaveListingButton';

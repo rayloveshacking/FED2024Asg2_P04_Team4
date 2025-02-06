@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import { doc, addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "../firebase";
-import { getAuth } from "firebase/auth";
+import { doc, addDoc, collection, serverTimestamp } from "firebase/firestore"; //This will import firestore methods to create documents and timestamps.
+import { db } from "../firebase"; //This will import the firebase database.
+import { getAuth } from "firebase/auth"; //This will import authentication methods from firebase.
 
 const CheckoutModal = ({ cart, totalPrice, onClose, clearCart }) => {
-  const [creditCard, setCreditCard] = useState("");
+  const [creditCard, setCreditCard] = useState(""); //This is the local state for storing the credit card information.
   const [expiry, setExpiry] = useState("");
   const [cvv, setCvv] = useState("");
-  const [processing, setProcessing] = useState(false);
-  const [message, setMessage] = useState("");
-  const auth = getAuth();
+  const [processing, setProcessing] = useState(false); //This is the state to indicate whether the payment process is happening.
+  const [message, setMessage] = useState(""); //This is the state for storing any success or error messages to display to the user.
+  const auth = getAuth(); //This will get the current authenticated user.
 
-  const handleCheckout = async (e) => {
-    e.preventDefault();
-    setProcessing(true);
+  const handleCheckout = async (e) => { //This is the function to handle the checkout process when the form is submitted.
+    e.preventDefault(); //This is to prevent from submitting the default form
+    setProcessing(true); //This set processing to true to disable form inputs and button.
 
     // Simulate payment processing delay
     setTimeout(async () => {
@@ -27,18 +27,19 @@ const CheckoutModal = ({ cart, totalPrice, onClose, clearCart }) => {
         });
         setMessage("Payment successful!");
         // Clear the cart since the order has been paid for
-        await clearCart();
+        await clearCart(); //After a short delay close the checkout modal.
         setTimeout(() => {
           onClose();
         }, 1500);
-      } catch (error) {
+      } catch (error) { //If an error occurs during the order creation, display the error message.
         setMessage("Error creating order. Try again.");
       }
-      setProcessing(false);
-    }, 1500);
+      setProcessing(false); //This is to reset the processing state.
+    }, 1500); //set 1500ms delay simulating payment processing.
   };
 
   return (
+    //Modal Overlay to cover the entire view port with a semi transparent background.
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded shadow-lg w-80">
         <h2 className="text-xl font-bold mb-4">Checkout</h2>

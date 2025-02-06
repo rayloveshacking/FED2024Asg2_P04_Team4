@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; //import react and other necessary components.
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { Link, useNavigate } from 'react-router-dom';
 import app from '../firebase';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
-    const auth = getAuth(app);
+    const [email, setEmail] = useState(''); //State variable for storing the email input.
+    const [password, setPassword] = useState(''); //State variable for storing the password input.
+    const [error, setError] = useState(''); //State variable for holding error messages.
+    const navigate = useNavigate(); //useNavigate hook to navigate to different routes.
+    const auth = getAuth(app); //Initialize firebase auth instance
 
-    const handleLogin = async (e) => {
+    const handleLogin = async (e) => { //Asynchronous function to handle login when form is submitted.
         e.preventDefault();
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            await signInWithEmailAndPassword(auth, email, password); //Attempt to sign in the user with the provided email and password.
             navigate('/');
         } catch (error) {
-            setError(error.message);
+            setError(error.message); // If error occurs during login, update the error state to display the error message.
         }
     };
 

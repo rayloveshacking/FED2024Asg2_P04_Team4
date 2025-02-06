@@ -1,19 +1,20 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState } from "react"; //import react and all necessary components.
 import { ShopContext } from "../context/ShopContext";
 import CheckoutModal from "../components/CheckoutModal";
 
 const Cart = () => {
-  const { cart, removeFromCart, updateCartQuantity, currency, clearCart } = useContext(ShopContext);
-  const [showCheckout, setShowCheckout] = useState(false);
+  const { cart, removeFromCart, updateCartQuantity, currency, clearCart } = useContext(ShopContext); //Destructure cart related state and functions from ShopContext
+  const [showCheckout, setShowCheckout] = useState(false); //This is the local state to control the visibility of the checkout modal.
 
-  const totalPrice = cart.reduce(
+  const totalPrice = cart.reduce( //This calculates the total price by reducing the cart items, multiply each item price by quantity and sum up the results.
     (acc, item) => acc + item.price * item.quantity,
     0
   );
 
-  return (
+  return ( //This is the main container for the cart page.
     <div className="max-w-4xl mx-auto my-8 p-4">
       <h2 className="text-2xl font-bold mb-4">Your Cart</h2>
+      {/*Conditional Rendering to show a message if cart is empty otherwise display the cart table */}
       {cart.length === 0 ? (
         <p>Your cart is empty.</p>
       ) : (
@@ -30,7 +31,7 @@ const Cart = () => {
               </tr>
             </thead>
             <tbody>
-              {cart.map((item) => (
+              {cart.map((item) => ( //Each cart item will be rendered as a table row with item.id as the unique key.
                 <tr key={item.id}>
                   <td className="border p-2">
                     <img
@@ -48,7 +49,7 @@ const Cart = () => {
                       type="number"
                       min="1"
                       value={item.quantity}
-                      onChange={(e) =>
+                      onChange={(e) => //This is to update the quantity on change, converting the input value to an integer.
                         updateCartQuantity(item.id, parseInt(e.target.value))
                       }
                       className="w-16 p-1 border"
@@ -82,7 +83,7 @@ const Cart = () => {
           </div>
         </div>
       )}
-      {showCheckout && (
+      {showCheckout && ( //Condtionally render the modal if showCheckout is true
         <CheckoutModal
           cart={cart}
           totalPrice={totalPrice}

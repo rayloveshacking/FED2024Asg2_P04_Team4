@@ -1,8 +1,8 @@
-import React from 'react'
+import React from 'react' //import react only
 
 const Newsletter = () => {
 
-    const onSubmitHandler = (event) => {
+    const onSubmitHandler = (event) => { //onSubmitHandler to prevent the default form submission.
         event.preventDefault();
     }
 

@@ -1,8 +1,6 @@
 import React from 'react';
-import { assets } from '../assets/assets';
-import { NavLink, Link } from 'react-router-dom';
-import Lottie from 'lottie-react';
-import heroAnimation from '../assets/animations/hero.json';
+import Lottie from 'lottie-react'; //import lottie for rendering animation.
+import heroAnimation from '../assets/animations/hero.json'; //import the lottie json file.
 
 const Hero = () => {
   return (

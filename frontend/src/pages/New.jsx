@@ -1,18 +1,18 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react'; //import react and other necessary components.
 import { ShopContext } from '../context/ShopContext';
 import { assets } from '../assets/assets';
 import Title from '../components/Title';
 import ProductItem from '../components/ProductItem';
 
 const New = () => { 
-  const { products, search, showSearch } = useContext(ShopContext);
-  const [showFilter, setShowFilter] = useState(false);
-  const [filterProducts, setFilterProducts] = useState([]);
-  const [category, setCategory] = useState([]);
-  const [subCategory, setSubCategory] = useState([]);
-  const [sortType, setSortType] = useState('relevant');
+  const { products, search, showSearch } = useContext(ShopContext); //This is to destructure products, search query and show search flag from shopcontext.
+  const [showFilter, setShowFilter] = useState(false); //This is a local state to control the visibility of filter options.
+  const [filterProducts, setFilterProducts] = useState([]); //This is a local state to hold the filtered list of products after applying search, category and subcategory filters.
+  const [category, setCategory] = useState([]); //This is a local state to hold selected categories for filtering.
+  const [subCategory, setSubCategory] = useState([]); ;//This is a local state to hold selected sub categories for filtering.
+  const [sortType, setSortType] = useState('relevant'); //This is a local state to hold the current sort type. Default is Relevant.
 
-  const toggleCategory = (e) => {
+  const toggleCategory = (e) => { //This is a function to toggle a category in the category filter list, it the category is already selected, it removes it otherwise it adds it.
     if (category.includes(e.target.value)) {
       setCategory(prev => prev.filter(item => item !== e.target.value));
     } else {
@@ -20,7 +20,7 @@ const New = () => {
     }
   };
 
-  const toggleSubCategory = (e) => {
+  const toggleSubCategory = (e) => { //This ia a function to toggle a subcategory in the subcategory filter list, similar logic to toggleCategory.
     if (subCategory.includes(e.target.value)) {
       setSubCategory(prev => prev.filter(item => item !== e.target.value));
     } else {
@@ -28,42 +28,42 @@ const New = () => {
     }
   };
 
-  const applyFilter = () => {
-    let productsCopy = products.slice();
-    if (showSearch && search) {
+  const applyFilter = () => { //This is a function that apply filters to the products list based on search text, category and subcategory.
+    let productsCopy = products.slice(); //This make a copy of the products array
+    if (showSearch && search) { // If the global showSearch flag is true and there is a search query, filter products whose name includes the search query
       productsCopy = productsCopy.filter(item =>
         item.name.toLowerCase().includes(search.toLowerCase())
       );
     }
-    if (category.length > 0) {
+    if (category.length > 0) { //If any category filters are selected, filter products by matching the product's category.
       productsCopy = productsCopy.filter(item => category.includes(item.category));
     }
-    if (subCategory.length > 0) {
+    if (subCategory.length > 0) { // If any subcategory filters are selected, filter products by matching the product's subCategory.
       productsCopy = productsCopy.filter(item => subCategory.includes(item.subCategory));
     }
-    setFilterProducts(productsCopy);
+    setFilterProducts(productsCopy); //This update the local state with the filter products
   };
 
-  const sortProduct = () => {
+  const sortProduct = () => { //This is a function to sort the filtered products based on the selected sort type, it sorts the filtered products copy and updates the state.
     let fpCopy = filterProducts.slice();
     switch (sortType) {
       case 'low-high':
-        setFilterProducts(fpCopy.sort((a, b) => a.price - b.price));
+        setFilterProducts(fpCopy.sort((a, b) => a.price - b.price)); //Sort products in ascending order by price.
         break;
       case 'high-low':
-        setFilterProducts(fpCopy.sort((a, b) => b.price - a.price));
+        setFilterProducts(fpCopy.sort((a, b) => b.price - a.price)); // Sort products in descending order by price.
         break;
       default:
-        applyFilter();
+        applyFilter(); // For 'relevant' or any other case, re apply filters
         break;
     }
   };
 
-  useEffect(() => {
+  useEffect(() => { //This useEffect reapply filters whenever category, subCategory, search or showSearch changes.
     applyFilter();
   }, [category, subCategory, search, showSearch]);
 
-  useEffect(() => {
+  useEffect(() => { // This useEffect resort products whenever the sortType changes.
     sortProduct();
   }, [sortType]);
 

@@ -5,10 +5,10 @@ import { db } from '../firebase';
 import app from '../firebase';
 
 const Profile = () => {
-  const auth = getAuth(app);
+  const auth = getAuth(app); //Initialize firebase auth using the app configuration.
   const user = auth.currentUser;
   
-  const [name, setName] = useState('');
+  const [name, setName] = useState(''); //Different states to store different datas.
   const [email, setEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -57,7 +57,7 @@ const Profile = () => {
     }
   };
 
-  return (
+  return ( //Main container for the profile page, centered
     <div className="max-w-md mx-auto my-8 p-4 border rounded">
       <h2 className="text-2xl font-bold mb-4">My Profile</h2>
       {error && <p className="text-red-500 mb-4">{error}</p>}

@@ -1,25 +1,25 @@
 // /src/pages/Orders.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // Import react and other necessary components.
 import { getAuth } from 'firebase/auth';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 
 const Orders = () => {
-  const [orders, setOrders] = useState([]);
-  const auth = getAuth();
+  const [orders, setOrders] = useState([]); //This is a local state to store the list of orders retrieved from firestore.
+  const auth = getAuth(); //This gets the firebase authentication instance.
 
-  useEffect(() => {
-    if (auth.currentUser) {
-      const q = query(
+  useEffect(() => { //This useEffect fetch orders for the current user and runs when the current user authentication state changes.
+    if (auth.currentUser) { //This make it to only run when there is a logged in user.
+      const q = query( //Fire store query that query the orders collection and filter to only include orders where the userId matches the current user's uid.
         collection(db, "orders"),
         where("userId", "==", auth.currentUser.uid)
       );
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        setOrders(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const unsubscribe = onSnapshot(q, (snapshot) => { // This will listen for real time updates to the query and the onSnapshot returns a function that cleans up the listener.
+        setOrders(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))); // This map over the snapshot documents to build an array of order objects.
       });
-      return () => unsubscribe();
+      return () => unsubscribe(); // Return the unsubscribe function to clean up the listener when the component unmounts or when the dependency changes.
     }
-  }, [auth.currentUser]);
+  }, [auth.currentUser]); // This effect depends on auth.currentUser
 
   return (
     <div className="max-w-4xl mx-auto my-8 p-4">

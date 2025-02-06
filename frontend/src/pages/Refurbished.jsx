@@ -1,18 +1,18 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react'; // Import react and other necessary components.
 import { ShopContext } from '../context/ShopContext';
 import { assets1 } from '../assets/assets1';
 import Title from '../components/Title';
 import ProductItem from '../components/ProductItem';
 
 const Refurbished = () => { 
-  const { refurbishedProducts, search, showSearch } = useContext(ShopContext);
-  const [showFilter, setShowFilter] = useState(false);
-  const [filterProducts, setFilterProducts] = useState([]);
-  const [category, setCategory] = useState([]);
-  const [subCategory, setSubCategory] = useState([]);
-  const [sortType, setSortType] = useState('relevant');
+  const { refurbishedProducts, search, showSearch } = useContext(ShopContext); //This destructure the global state variables from ShopContext.
+  const [showFilter, setShowFilter] = useState(false); //This is a local state to control whether the filter options are displayed.
+  const [filterProducts, setFilterProducts] = useState([]); //This is a local state to store the list of products after applying filters.
+  const [category, setCategory] = useState([]); //This is a local state to store selected categories for filtering.
+  const [subCategory, setSubCategory] = useState([]); // This is a local state to store selected subCategories for filtering.
+  const [sortType, setSortType] = useState('relevant'); // This is a local state to store the current sort type; default to "relevant".
 
-  const toggleCategory = (e) => {
+  const toggleCategory = (e) => { //This is a function to toggle a category filter when a checkbox is clicked, if it's already selected, it's removed otherwise it's added.
     if (category.includes(e.target.value)) {
       setCategory(prev => prev.filter(item => item !== e.target.value));
     } else {
@@ -20,7 +20,7 @@ const Refurbished = () => {
     }
   };
 
-  const toggleSubCategory = (e) => {
+  const toggleSubCategory = (e) => { //This is a function to toggle a subcategory filter when a checkbox is cliked, it works similarly to toggleCategory.
     if (subCategory.includes(e.target.value)) {
       setSubCategory(prev => prev.filter(item => item !== e.target.value));
     } else {
@@ -28,29 +28,29 @@ const Refurbished = () => {
     }
   };
 
-  const applyFilter = () => {
-    let productsCopy = refurbishedProducts.slice();
-    if (showSearch && search) {
+  const applyFilter = () => { // This is a function to apply filters to the refurbishedProducts array.
+    let productsCopy = refurbishedProducts.slice(); //A copy of the refurbished products array is created.
+    if (showSearch && search) { //If the global showSearch flag is active and there is a searchquery, filter products whose name includes the search query.
       productsCopy = productsCopy.filter(item =>
         item.name.toLowerCase().includes(search.toLowerCase())
       );
     }
-    if (category.length > 0) {
+    if (category.length > 0) { //Filter products to only include those in the selected categories
       productsCopy = productsCopy.filter(item => category.includes(item.category));
     }
-    if (subCategory.length > 0) {
+    if (subCategory.length > 0) { //This is similar to category filer but works for sub category.
       productsCopy = productsCopy.filter(item => subCategory.includes(item.subCategory));
     }
     setFilterProducts(productsCopy);
   };
 
-  const sortProduct = () => {
+  const sortProduct = () => { // This is the function to sort the filtered products based on the sort type.
     let fpCopy = filterProducts.slice();
     switch (sortType) {
-      case 'low-high':
+      case 'low-high': //low-high sorts in ascending order of price
         setFilterProducts(fpCopy.sort((a, b) => a.price - b.price));
         break;
-      case 'high-low':
+      case 'high-low': // high-low sorts in descending order.
         setFilterProducts(fpCopy.sort((a, b) => b.price - a.price));
         break;
       default:
@@ -59,11 +59,11 @@ const Refurbished = () => {
     }
   };
 
-  useEffect(() => {
+  useEffect(() => { //This reapply filters whenever category, subcategory, search or showSearch changes
     applyFilter();
   }, [category, subCategory, search, showSearch]);
 
-  useEffect(() => {
+  useEffect(() => { //This useEffect resort products whenever the sortType changes.
     sortProduct();
   }, [sortType]);
 

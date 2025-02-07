@@ -1,27 +1,27 @@
 // /src/components/Chat.jsx
-import React, { useState, useEffect } from 'react'; //import react and all the other necessary components
+import React, { useState, useEffect } from 'react'; //import react, firebase and other necessary components.
 import { collection, doc, setDoc, addDoc, query, orderBy, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 const Chat = ({ sellerId }) => {
-  const auth = getAuth(); //This will get the firebase auth instance.
-  const [currentUser, setCurrentUser] = useState(null); //Different states to store different datas.
+  const auth = getAuth(); //initialize firebase authentication instance
+  const [currentUser, setCurrentUser] = useState(null); //Different states to store nad hold different datas.
   const [authChecked, setAuthChecked] = useState(false);
   const [conversationId, setConversationId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
-  useEffect(() => { //This useEffect will listen for authentication changes.
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => { //This monitors for authentication status changes.
-      setCurrentUser(user);
-      setAuthChecked(true);
+  useEffect(() => { //This useEffect listen for changes in authentication status
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => { //This subscribe to authentication state changes.
+      setCurrentUser(user); //update current user when the state changes.
+      setAuthChecked(true); //Mark that authentication has been checked.
     });
-    return () => unsubscribeAuth(); //This clean up the auth listener when the component unmounts
+    return () => unsubscribeAuth();
   }, [auth]);
 
-  useEffect(() => { //This useEffect set up the conversation document.
-    if (currentUser && sellerId) { //Condition check to only proceed if both current user and sellerId are available.
+  useEffect(() => { //This will create or update the conversation document in firestore when currentUser or sellerId changes.
+    if (currentUser && sellerId) {
       const ids = [currentUser.uid, sellerId].sort();
       const convId = ids.join('_');
       setConversationId(convId);
@@ -33,7 +33,7 @@ const Chat = ({ sellerId }) => {
     }
   }, [currentUser, sellerId]);
 
-  useEffect(() => { //This useEffect listen for new messages in the conversation.
+  useEffect(() => { //This set up a real time listener for messages in the current conversation.
     if (conversationId) {
       const messagesRef = collection(db, 'chats', conversationId, 'messages');
       const q = query(messagesRef, orderBy('timestamp', 'asc'));
@@ -49,42 +49,38 @@ const Chat = ({ sellerId }) => {
     if (newMessage.trim() === "") return;
     if (!currentUser) return;
     const messagesRef = collection(db, 'chats', conversationId, 'messages');
-    // Add the message
     await addDoc(messagesRef, {
       senderId: currentUser.uid,
-      recipientId: sellerId,
       text: newMessage,
       timestamp: new Date()
     });
-    // Update the conversation document
-    const convDocRef = doc(db, 'chats', conversationId);
+    const convDocRef = doc(db, 'chats', conversationId); //This update the conversation document with the latest message and updated timestamp.
     await setDoc(convDocRef, {
       participants: [currentUser.uid, sellerId],
       lastMessage: newMessage,
       lastUpdated: new Date()
     }, { merge: true });
-    // Send a notification to the recipient if they are not the sender
-    if (sellerId !== currentUser.uid) {
-      await addDoc(collection(db, "notifications"), {
-        userId: sellerId,
-        type: "message",
-        message: `New message from ${currentUser.displayName || currentUser.email}: ${newMessage}`,
-        link: `/chats/${conversationId}`,
-        read: false,
-        createdAt: serverTimestamp()
-      });
-    }
+    // Determine the recipient as the other participant in the conversation.
+    const recipientId = conversationId.split('_').find(id => id !== currentUser.uid);
+    await addDoc(collection(db, "notifications"), {
+      userId: recipientId,
+      type: "message",
+      message: `New message from ${currentUser.displayName || currentUser.email}: ${newMessage}`,
+      link: `/chats/${conversationId}`,
+      read: false,
+      createdAt: serverTimestamp()
+    });
     setNewMessage('');
   };
 
-  if (!authChecked) { //To render loading state or login prompt if necessary
+  if (!authChecked) { //This displays a loading message until authentication has been checked.
     return <div>Loading...</div>;
   }
-  if (!currentUser) {
+  if (!currentUser) { //This prompt the user to login if there is no authenticated user.
     return <div>Please log in to chat.</div>;
   }
 
-  return ( //This render the chat ui
+  return ( //Main container for rendering the chat interface.
     <div className="chat-window border p-4 max-w-md mx-auto">
       <h3 className="text-xl font-bold mb-2">Chat with Seller</h3>
       <div className="messages h-64 overflow-y-auto border p-2 mb-2">

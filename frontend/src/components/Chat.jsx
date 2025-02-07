@@ -1,27 +1,27 @@
 // /src/components/Chat.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; //import react and all the other necessary components
 import { collection, doc, setDoc, addDoc, query, orderBy, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 const Chat = ({ sellerId }) => {
-  const auth = getAuth();
-  const [currentUser, setCurrentUser] = useState(null);
+  const auth = getAuth(); //This will get the firebase auth instance.
+  const [currentUser, setCurrentUser] = useState(null); //Different states to store different datas.
   const [authChecked, setAuthChecked] = useState(false);
   const [conversationId, setConversationId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
-  useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+  useEffect(() => { //This useEffect will listen for authentication changes.
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => { //This monitors for authentication status changes.
       setCurrentUser(user);
       setAuthChecked(true);
     });
-    return () => unsubscribeAuth();
+    return () => unsubscribeAuth(); //This clean up the auth listener when the component unmounts
   }, [auth]);
 
-  useEffect(() => {
-    if (currentUser && sellerId) {
+  useEffect(() => { //This useEffect set up the conversation document.
+    if (currentUser && sellerId) { //Condition check to only proceed if both current user and sellerId are available.
       const ids = [currentUser.uid, sellerId].sort();
       const convId = ids.join('_');
       setConversationId(convId);
@@ -33,7 +33,7 @@ const Chat = ({ sellerId }) => {
     }
   }, [currentUser, sellerId]);
 
-  useEffect(() => {
+  useEffect(() => { //This useEffect listen for new messages in the conversation.
     if (conversationId) {
       const messagesRef = collection(db, 'chats', conversationId, 'messages');
       const q = query(messagesRef, orderBy('timestamp', 'asc'));
@@ -45,7 +45,7 @@ const Chat = ({ sellerId }) => {
     }
   }, [conversationId]);
 
-  const handleSend = async () => {
+  const handleSend = async () => { //This is the function to handle sending a new message.
     if (newMessage.trim() === "") return;
     if (!currentUser) return;
     const messagesRef = collection(db, 'chats', conversationId, 'messages');
@@ -77,14 +77,14 @@ const Chat = ({ sellerId }) => {
     setNewMessage('');
   };
 
-  if (!authChecked) {
+  if (!authChecked) { //To render loading state or login prompt if necessary
     return <div>Loading...</div>;
   }
   if (!currentUser) {
     return <div>Please log in to chat.</div>;
   }
 
-  return (
+  return ( //This render the chat ui
     <div className="chat-window border p-4 max-w-md mx-auto">
       <h3 className="text-xl font-bold mb-2">Chat with Seller</h3>
       <div className="messages h-64 overflow-y-auto border p-2 mb-2">

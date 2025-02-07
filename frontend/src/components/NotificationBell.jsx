@@ -1,20 +1,20 @@
 // /src/components/NotificationBell.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; //import react and other necessary components.
 import { getAuth } from 'firebase/auth';
 import { collection, query, where, onSnapshot, orderBy, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import { assets } from '../assets/assets';
 
-const NotificationBell = () => {
+const NotificationBell = () => { //Initializing firebase auth and retrieving user as well as storing different data for different states.
   const auth = getAuth();
   const currentUser = auth.currentUser;
   const [notifications, setNotifications] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const bellRef = useRef(null);
 
-  useEffect(() => {
-    if (currentUser) {
-      const q = query(
+  useEffect(() => { //This effect is used to listen for notifications for the current user.
+    if (currentUser) { //Condition check to ensure that the effect only run if the user is logged in.
+      const q = query( //To create a firestore query on the notification collection.
         collection(db, "notifications"),
         where("userId", "==", currentUser.uid),
         orderBy("createdAt", "desc")
@@ -27,7 +27,7 @@ const NotificationBell = () => {
     }
   }, [currentUser]);
 
-  useEffect(() => {
+  useEffect(() => { //This effect is to handle clicks outside the bell to close the dropdown.
     const handleClickOutside = (event) => {
       if (bellRef.current && !bellRef.current.contains(event.target)) {
         setDropdownOpen(false);
@@ -37,7 +37,7 @@ const NotificationBell = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const markAsRead = async (notifId) => {
+  const markAsRead = async (notifId) => { //This is the function to mark a notification as read.
     try {
       const notifRef = doc(db, "notifications", notifId);
       await updateDoc(notifRef, { read: true, updatedAt: serverTimestamp() });
@@ -49,9 +49,9 @@ const NotificationBell = () => {
     }
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter(n => !n.read).length; //This is used to calculate the number of unread notifications.
 
-  return (
+  return ( //This is the container for the notification bell with a ref attached for detecting outside clicks.
     <div className="relative" ref={bellRef}>
       <button
         onClick={() => setDropdownOpen(!dropdownOpen)}

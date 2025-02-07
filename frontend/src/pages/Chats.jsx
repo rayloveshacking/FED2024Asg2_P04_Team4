@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; //import react and other necessary components.
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -35,10 +35,10 @@ const Chats = () => {
     }
   }, [currentUser]);
 
-  if (!authChecked) {
+  if (!authChecked) { //Condition check for authentication.
     return <div>Loading...</div>;
   }
-  if (!currentUser) {
+  if (!currentUser) { //Condition check to only show chats to logged in users.
     return <div>Please log in to view your chats.</div>;
   }
 

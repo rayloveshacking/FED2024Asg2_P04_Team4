@@ -1,5 +1,5 @@
 // /src/components/Navbar.jsx
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react'; //import react and all other necessary components.
 import { onAuthStateChanged, getAuth, signOut } from 'firebase/auth';
 import { assets } from '../assets/assets';
 import { NavLink, Link } from 'react-router-dom';
@@ -10,22 +10,22 @@ import { db } from '../firebase';
 import NotificationBell from './NotificationBell'; // New import for notifications
 
 const Navbar = () => { 
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false); //Different states to store different datas and controls.
   const { setShowSearch } = useContext(ShopContext);
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const profileRef = useRef(null);
-  const auth = getAuth(app);
+  const auth = getAuth(app); //Initialize firebase auth with the app config.
 
-  useEffect(() => {
+  useEffect(() => { //This is used to listen for changes in the authentication state.
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
     });
-    return () => unsubscribe();
+    return () => unsubscribe(); //This clean up subscription on component unmount.
   }, [auth]);
 
-  useEffect(() => {
+  useEffect(() => { //This is to fetch the user's role from firestore when a user is authenticated.
     if (user) {
       const fetchUserRole = async () => {
         const userDocRef = doc(db, 'users', user.uid);
@@ -40,7 +40,7 @@ const Navbar = () => {
     }
   }, [user]);
 
-  const handleLogout = async () => {
+  const handleLogout = async () => { //This is the function to handle user logout.
     try {
       await signOut(auth);
       setProfileMenuOpen(false);
@@ -49,7 +49,7 @@ const Navbar = () => {
     }
   };
 
-  useEffect(() => {
+  useEffect(() => { //This is used to close the profile dropdown if a click is detected outside.
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setProfileMenuOpen(false);
@@ -59,7 +59,7 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [profileRef]);
 
-  return (
+  return ( //The main container for navbar, styled to space items fairly.
     <div className='flex items-center justify-between py-5 font-medium'>
       <Link to={'/'}>
         <img src={assets.logo} className='w-36' alt="Logo" />

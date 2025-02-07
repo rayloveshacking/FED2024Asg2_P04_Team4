@@ -1,5 +1,5 @@
 // /src/pages/SellerDashBoard.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; //import react and all other necessary components.
 import axios from 'axios';
 import { db } from '../firebase';
 import { collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp, onSnapshot } from 'firebase/firestore';
@@ -151,7 +151,7 @@ const SellerDashboard = () => {
     }
   }, []);
 
-  return (
+  return ( //Main container to render the seller dash board user interface.
     <div className="max-w-2xl mx-auto my-8 p-4">
       <h2 className="text-2xl font-bold mb-6 text-center">Upload Product</h2>
       <form onSubmit={handleUpload} className="space-y-6">

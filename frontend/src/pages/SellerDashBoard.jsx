@@ -1,5 +1,5 @@
 // /src/pages/SellerDashBoard.jsx
-import React, { useState, useEffect } from 'react'; //import react and other necessary components.
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { db } from '../firebase';
 import { collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp, onSnapshot } from 'firebase/firestore';
@@ -8,10 +8,10 @@ import app from '../firebase';
 import ProductItem from '../components/ProductItem';
 import BumpListing from '../components/BumpListing';
 
-const auth = getAuth(app); //This initializes firebase auth using the app configuration.
+const auth = getAuth(app);
 
 const SellerDashboard = () => {
-  const [product, setProduct] = useState({ //This is a state to hold the product details being uploaded, it contain fields.
+  const [product, setProduct] = useState({
     name: '',
     price: '',
     description: '',
@@ -20,28 +20,28 @@ const SellerDashboard = () => {
     type: 'new',
     image: [] // Cloudinary image URLs
   });
-  const [files, setFiles] = useState([]); //This is a state to hold the selected file objects.
-  const [error, setError] = useState(''); //This is the state to store any error messages during the upload process.
-  const [success, setSuccess] = useState(''); //This is the state to store success messages.
-  const [uploading, setUploading] = useState(false); //This is the state to indicate whether an image upload is in progree or not.
-  const [myProducts, setMyProducts] = useState([]); //This is the state to hold the seller's active product listings.
+  const [files, setFiles] = useState([]);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [myProducts, setMyProducts] = useState([]);
 
   // Upload a single image to Cloudinary
   const uploadImageToCloudinary = async (file) => {
     const data = new FormData();
-    data.append('file', file); //This append the file and required cloudinary parameters.
+    data.append('file', file);
     data.append('upload_preset', 'unsigned_preset'); // your preset
     data.append('cloud_name', 'dls2ndk2q'); // your cloud name
     try {
       const res = await axios.post(`https://api.cloudinary.com/v1_1/dls2ndk2q/image/upload`, data);
       return res.data.secure_url;
     } catch (err) {
-      console.error('Cloudinary upload error:', err); //This log and rethrow any errors during upload.
+      console.error('Cloudinary upload error:', err);
       throw err;
     }
   };
 
-  // Check active listings count (only count listings that have not yet expired)
+  // Check active listings limit (only count listings that have not yet expired)
   const checkActiveListingsLimit = async () => {
     const q = query(
       collection(db, 'products'),
@@ -53,46 +53,66 @@ const SellerDashboard = () => {
     return snapshot.size;
   };
 
-  const handleFilesChange = (e) => { //This is the event handler for the file input change, it converts the filelist object in to an array and update the state.
+  const handleFilesChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     setFiles(selectedFiles);
   };
 
-  const handleUpload = async (e) => { //This is a function to handle the form submission for uploading a product.
-    e.preventDefault(); //To prevent default form submission.
-    setError(''); //To clear any existing errors.
-    setSuccess(''); //To clear any existing success messages
-    setUploading(true); //To indicate that the upload process is in progress.
+  // Function to send a notification to each follower about a new listing
+  const sendNewListingNotification = async (productId, productName) => {
+    const followersQuery = query(
+      collection(db, "users"),
+      where("following", "array-contains", auth.currentUser.uid)
+    );
+    const followersSnapshot = await getDocs(followersQuery);
+    followersSnapshot.forEach(async (docSnap) => {
+      const followerId = docSnap.id;
+      await addDoc(collection(db, "notifications"), {
+        userId: followerId,
+        type: "new_listing",
+        message: `New product "${productName}" listed by ${auth.currentUser.displayName || "Seller"}.`,
+        link: `/product/${productId}`,
+        read: false,
+        createdAt: serverTimestamp()
+      });
+    });
+  };
+
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setUploading(true);
 
     try {
-      // Enforce active listings limit of 30 (only count non-expired listings)
       const activeCount = await checkActiveListingsLimit();
       if (activeCount >= 30) {
         throw new Error("You have reached the maximum of 30 active listings.");
       }
 
-      if (!files.length) { //If no files are selected, throw an error.
+      if (!files.length) {
         throw new Error("Please upload at least one image.");
       }
 
-      const uploadedUrls = await Promise.all(files.map(file => uploadImageToCloudinary(file))); //This upload all selected files to cloudinary.
-      const now = new Date(); //Get the currnt date time.
+      const uploadedUrls = await Promise.all(files.map(file => uploadImageToCloudinary(file)));
+      const now = new Date();
       const expiryDate = Timestamp.fromDate(new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)); // 30 days later
 
-      const newProduct = { //Create a new product object combining form data and additional meta data.
+      const newProduct = {
         ...product,
         image: uploadedUrls,
         price: Number(product.price),
         sellerId: auth.currentUser.uid,
         sellerName: auth.currentUser.displayName || '',
-        active: true,       // Mark listing as active
-        bump: 0,            // Default bump value
+        active: true,
+        bump: 0,
         listDate: Timestamp.fromDate(now),
         expiryDate: expiryDate,
         createdAt: serverTimestamp()
       };
 
-      await addDoc(collection(db, 'products'), newProduct); //Add the new product document to the products collection.
+      // Add new product and get its reference (to retrieve its ID)
+      const productRef = await addDoc(collection(db, 'products'), newProduct);
 
       setSuccess("Product uploaded successfully!");
       setProduct({
@@ -104,9 +124,12 @@ const SellerDashboard = () => {
         type: 'new',
         image: []
       });
-      setFiles([]); //Clear the selected files.
+      setFiles([]);
+
+      // Send notifications to followers about the new listing
+      await sendNewListingNotification(productRef.id, newProduct.name);
     } catch (err) {
-      console.error("Error uploading product:", err); //Log any errors that occur during upload process.
+      console.error("Error uploading product:", err);
       setError(err.message);
     }
     setUploading(false);
@@ -114,25 +137,24 @@ const SellerDashboard = () => {
 
   // Fetch seller's active listings
   useEffect(() => {
-    const sellerId = auth.currentUser ? auth.currentUser.uid : null; //This get the seller's id from the current user.
+    const sellerId = auth.currentUser ? auth.currentUser.uid : null;
     if (sellerId) {
-      const q = query( //This create a firestore query to get products belonging to the seller that is not expired.
+      const q = query(
         collection(db, "products"),
         where("sellerId", "==", sellerId),
         where("expiryDate", ">", new Date())
       );
-      const unsubscribe = onSnapshot(q, (snapshot) => { //This set up a real time listener for the query.
-        setMyProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))); //This update the myProducts state with the retrieved products.
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        setMyProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       });
-      return () => unsubscribe(); //This clean up the listener when the component unmounts.
+      return () => unsubscribe();
     }
-  }, []); //Empty the array to run this effect once on mount.
+  }, []);
 
   return (
     <div className="max-w-2xl mx-auto my-8 p-4">
       <h2 className="text-2xl font-bold mb-6 text-center">Upload Product</h2>
       <form onSubmit={handleUpload} className="space-y-6">
-        {/* Product Name */}
         <div>
           <label className="block text-sm font-medium text-gray-700">Product Name</label>
           <input
@@ -143,7 +165,6 @@ const SellerDashboard = () => {
             required
           />
         </div>
-        {/* Price */}
         <div>
           <label className="block text-sm font-medium text-gray-700">Price</label>
           <input
@@ -154,7 +175,6 @@ const SellerDashboard = () => {
             required
           />
         </div>
-        {/* Description */}
         <div>
           <label className="block text-sm font-medium text-gray-700">Description</label>
           <textarea
@@ -164,7 +184,6 @@ const SellerDashboard = () => {
             required
           />
         </div>
-        {/* Category */}
         <div>
           <label className="block text-sm font-medium text-gray-700">Category</label>
           <select
@@ -177,7 +196,6 @@ const SellerDashboard = () => {
             <option value="Mobile Devices">Mobile Devices</option>
           </select>
         </div>
-        {/* SubCategory */}
         <div>
           <label className="block text-sm font-medium text-gray-700">SubCategory</label>
           <select
@@ -192,7 +210,6 @@ const SellerDashboard = () => {
             <option value="Phone">Phone</option>
           </select>
         </div>
-        {/* Product Type */}
         <div>
           <label className="block text-sm font-medium text-gray-700">Product Type</label>
           <div className="flex gap-4 mt-1">
@@ -220,7 +237,6 @@ const SellerDashboard = () => {
             </label>
           </div>
         </div>
-        {/* File Upload */}
         <div>
           <label className="block text-sm font-medium text-gray-700">Product Images</label>
           <input
@@ -235,11 +251,9 @@ const SellerDashboard = () => {
             {files.length > 0 && `${files.length} file(s) selected`}
           </div>
         </div>
-        {/* Status Messages */}
         {uploading && <div className="text-sm text-blue-600">Uploading images...</div>}
         {error && <div className="text-red-600 text-sm mt-2">{error}</div>}
         {success && <div className="text-green-600 text-sm mt-2">{success}</div>}
-        {/* Submit Button */}
         <button
           type="submit"
           disabled={uploading}
@@ -249,7 +263,6 @@ const SellerDashboard = () => {
         </button>
       </form>
 
-      {/* My Listings Section */}
       <div className="mt-10">
         <h2 className="text-2xl font-bold mb-4">My Listings</h2>
         {myProducts.length === 0 ? (

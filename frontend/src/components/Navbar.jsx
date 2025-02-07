@@ -1,4 +1,5 @@
-import React, { useContext, useState, useEffect, useRef } from 'react'; //import react and all necessary components.
+// /src/components/Navbar.jsx
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { onAuthStateChanged, getAuth, signOut } from 'firebase/auth';
 import { assets } from '../assets/assets';
 import { NavLink, Link } from 'react-router-dom';
@@ -6,50 +7,48 @@ import { ShopContext } from '../context/ShopContext';
 import app from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import NotificationBell from './NotificationBell'; // New import for notifications
 
 const Navbar = () => { 
-  const [visible, setVisible] = useState(false); // State to control the visibility of the sidebar menu for small screens.
-  const { setShowSearch } = useContext(ShopContext); // Retrieve the function to show/hide the search bar from the global context.
-  const [user, setUser] = useState(null); // Store the current authenticated user.
-  const [userRole, setUserRole] = useState(null); // Store the user's role.
-  const [profileMenuOpen, setProfileMenuOpen] = useState(false); // Control whether the profile dropdown is open.
-  const profileRef = useRef(null); // Ref to the profile dropdown container for detecting outside clicks.
-  const auth = getAuth(app); // Initialize firebase auth using the app instance.
+  const [visible, setVisible] = useState(false);
+  const { setShowSearch } = useContext(ShopContext);
+  const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const profileRef = useRef(null);
+  const auth = getAuth(app);
 
-  // Listen for authentication changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
     });
-    return () => unsubscribe(); // Clean up the listener on component unmount.
+    return () => unsubscribe();
   }, [auth]);
 
-  // Fetch user role if logged in
   useEffect(() => {
     if (user) {
       const fetchUserRole = async () => {
-        const userDocRef = doc(db, 'users', user.uid); // Get reference to the user's document in firestore.
-        const docSnap = await getDoc(userDocRef); // Retrieve the document snapshot.
-        if (docSnap.exists()) { // Set the user's role if document exists.
+        const userDocRef = doc(db, 'users', user.uid);
+        const docSnap = await getDoc(userDocRef);
+        if (docSnap.exists()) {
           setUserRole(docSnap.data().role);
         }
       };
       fetchUserRole();
     } else {
-      setUserRole(null); // Reset the role if no user is authenticated.
+      setUserRole(null);
     }
   }, [user]);
 
-  const handleLogout = async () => { // Handle user logout.
+  const handleLogout = async () => {
     try {
-      await signOut(auth); // Sign out the user using firebase auth.
-      setProfileMenuOpen(false); // Close the profile dropdown after logging out.
+      await signOut(auth);
+      setProfileMenuOpen(false);
     } catch (error) {
       console.error('Logout error:', error);
     }
   };
 
-  // Close the profile dropdown if a click is detected outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
@@ -60,12 +59,11 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [profileRef]);
 
-  return ( // Navbar container with flex layout to arrange items horizontally.
+  return (
     <div className='flex items-center justify-between py-5 font-medium'>
       <Link to={'/'}>
         <img src={assets.logo} className='w-36' alt="Logo" />
       </Link>
-      {/* Nav links for larger screens */}
       <ul className='hidden sm:flex gap-12 text-sm text-gray-700 font-sans'>
         <NavLink to='/' className='flex flex-col items-center gap-1'>
           <p className="font-bold">SHOP</p>
@@ -99,6 +97,8 @@ const Navbar = () => {
           className='w-5 cursor-pointer'
           alt="Search"
         />
+        {/* Notification Bell */}
+        <NotificationBell />
         {/* Profile Icon with dropdown */}
         <div ref={profileRef} className='relative'>
           <img
@@ -123,14 +123,10 @@ const Navbar = () => {
                         Seller Dashboard
                       </Link>
                     )}
-                    {/* New Chats Button */}
                     <Link onClick={() => setProfileMenuOpen(false)} to="/chats" className="cursor-pointer hover:text-black">
                       Chats
                     </Link>
-                    <p
-                      className="cursor-pointer hover:text-black"
-                      onClick={handleLogout}
-                    >
+                    <p className="cursor-pointer hover:text-black" onClick={handleLogout}>
                       Logout
                     </p>
                   </>
@@ -156,7 +152,6 @@ const Navbar = () => {
           alt="Menu"
         />
       </div>
-      {/* Sidebar menu for small screens */}
       <div className={`absolute top-0 right-0 bottom-0 overflow-hidden bg-white transition-all ${visible ? 'w-full' : 'w-0'}`}>
         <div className="flex flex-col text-gray-600">
           <div onClick={() => setVisible(false)} className="flex items-center gap-4 p-3 cursor-pointer">

@@ -27,10 +27,10 @@ For design mockups and wireframes, please visit our [Figma URL](https://www.figm
 - **Following Between Users:** Users can follow sellers and see their latest listings as well as their specific listings.
 - **Create Listings:** Sellers can upload their products using our seller dashboard to easily sell their products.
 - **Active Listings:** Listings wil automatically become inactive after 30 days so that the website is clean.
-
-
-### Features Left to Implement
-
+- **User Rating and Reviews:** Users can rate and review products to build trust within the market place.
+- **User Notifications:** Users receive notifications for new listings, offers and messages from the sellers to stay updated and be informed.
+- **Chat Feature:** Users can talk to sellers about the items to ask various questions and establish a connection with the seller.
+- **Gamification:** Users can get points and rewards for buying items or finding secret items scattered across the website.
 
 ## Technologies Used
 

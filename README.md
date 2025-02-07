@@ -2,6 +2,9 @@
 
 Mokesell is a premium ecommerce online store that will bring the latest products from brand new arrivals to high quality refurbished products. Built with React and Vite, MokeSell offers a smooth, responsive shopping experience with advanced features such as product bumping, saved listings and real time order tracking. Our mission is to make online shopping both enjoyable and efficient for every user.
 
+## Visit our website:
+-[MokeSell](https://rayloveshacking.github.io/FED2024Asg2_P04_Team4/)
+
 ## Design Process
 
 Our design process began with understanding our target users: tech-savvy shoppers looking for high-quality products at competitive prices. We wanted to create an intuitive interface that guides users effortlessly from browsing to purchase.
@@ -131,6 +134,3 @@ Below is the updated testing documentation incorporating the latest changes to t
 ### Acknowledgements
 - Special thanks to Bhaveesh for his insights and support.
 - Inspired by various e-commerce sites and best practices in UI/UX design.
-
-## Visit our website:
--[MokeSell](https://rayloveshacking.github.io/FED2024Asg2_P04_Team4/)

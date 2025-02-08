@@ -82,7 +82,8 @@ We have leveraged AI tools to enhance our development process.
 
 4. **Storing and Fetching Images from Cloudinary**
    We used ChatGpt to assist us in fetching and storing images from cloudinary with this code snippet below:
-   <img width="574" alt="image" src="https://github.com/user-attachments/assets/8d7b0916-08cf-48e4-83b9-2b788557d7b6" />
+   
+<img width="574" alt="image" src="https://github.com/user-attachments/assets/8d7b0916-08cf-48e4-83b9-2b788557d7b6" />
 
 
 Below is the updated testing documentation incorporating the latest changes to the website:

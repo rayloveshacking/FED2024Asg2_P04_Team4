@@ -5,7 +5,7 @@ Mokesell is a premium ecommerce online store that will bring the latest products
 ## Visit our website:
 -[MokeSell](https://rayloveshacking.github.io/FED2024Asg2_P04_Team4/)
 
-## Our Video Demo:
+## Our Video Presentation:
 -[Google Drive Link](https://drive.google.com/file/d/1ykHkscW4AHoNr9fU9IENQriqCga4tfDp/view?usp=sharing)
 
 ## Design Process

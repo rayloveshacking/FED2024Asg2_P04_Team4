@@ -121,6 +121,10 @@ Below is the updated testing documentation incorporating the latest changes to t
    - Navigate to different routes (e.g., home, new, refurbished) and verify that they load correctly.
    - Refresh the page on sub-routes (e.g., `/new`); if using BrowserRouter, confirm that appropriate fallback or redirection (or a custom 404 page) is implemented to handle refreshes on non-root URLs.
 
+7. **Profile Nav Menu Testing:**
+   - Created a new user with customer role and tested if the seller dashboard appears under the profile menu or not as the dashboard must only appear for the sellers..
+   - Created a new user with seller role and test if the seller dashboard correctly appears everytime.
+
 ## Credits
 
 ### Content

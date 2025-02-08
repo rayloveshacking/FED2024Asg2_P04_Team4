@@ -1,11 +1,11 @@
 // /src/components/Reviews.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; //import react and other necessary components.
 import { collection, query, where, orderBy, addDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import { getAuth } from 'firebase/auth';
 
 const Reviews = ({ productId }) => {
-  const [reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState([]); //Different states to hold different datas as well as handling authentication.
   const [newReview, setNewReview] = useState("");
   const [rating, setRating] = useState(5);
   const [error, setError] = useState("");
@@ -33,7 +33,7 @@ const Reviews = ({ productId }) => {
       : 0;
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); //This is used to prevent default form submission.
     setError("");
     if (!auth.currentUser) {
       setError("You must be logged in to leave a review.");
@@ -57,7 +57,7 @@ const Reviews = ({ productId }) => {
     }
   };
 
-  return (
+  return ( //Main container for rendering the review ui.
     <div className="reviews-section my-6">
       <h3 className="text-xl font-bold mb-2">Reviews</h3>
       <div className="average-rating mb-4">

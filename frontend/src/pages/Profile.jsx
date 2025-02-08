@@ -1,34 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { getAuth, updateEmail, updatePassword, updateProfile, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
-import { doc, updateDoc } from 'firebase/firestore';
+// /src/pages/Profile.jsx
+import React, { useState, useEffect } from 'react'; //import react and firebase auth methods for updating mail, password and reauthentication.
+import {
+  getAuth,
+  updateEmail,
+  updatePassword,
+  updateProfile,
+  EmailAuthProvider,
+  reauthenticateWithCredential
+} from 'firebase/auth';
+import { doc, updateDoc } from 'firebase/firestore'; //import firebase components.
 import { db } from '../firebase';
 import app from '../firebase';
+import Rewards from '../components/Rewards';
 
 const Profile = () => {
-  const auth = getAuth(app); //Initialize firebase auth using the app configuration.
+  const auth = getAuth(app); //This initializes firebase auth with the app configuration.
   const user = auth.currentUser;
-  
+
   const [name, setName] = useState(''); //Different states to store different datas.
   const [email, setEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  // Load current user data when the component mounts
-  useEffect(() => {
+  useEffect(() => { //This effect load the user's current profile data 
     if (user) {
       setName(user.displayName || '');
       setEmail(user.email || '');
     }
   }, [user]);
 
-  const handleUpdate = async (e) => {
+  const handleUpdate = async (e) => { //This is the function to handle profile updates when form is submitted.
     e.preventDefault();
     setError('');
     setMessage('');
     
-    try {
-      // Prompt user for their current password to reauthenticate
+    try { //Prompt the user for their current password for reauth.
       const currentPassword = prompt("Please enter your current password to continue");
       if (!currentPassword) {
         throw new Error("Current password is required for reauthentication.");
@@ -36,18 +43,14 @@ const Profile = () => {
       const credential = EmailAuthProvider.credential(user.email, currentPassword);
       await reauthenticateWithCredential(user, credential);
       
-      // Update email if changed
-      if (user.email !== email) {
+      if (user.email !== email) { //Different condition checks to update different datas.
         await updateEmail(user, email);
       }
-      // Update password if provided
       if (newPassword) {
         await updatePassword(user, newPassword);
       }
-      // Update display name if changed
       if (user.displayName !== name) {
         await updateProfile(user, { displayName: name });
-        // Also update the user's Firestore document
         const userRef = doc(db, 'users', user.uid);
         await updateDoc(userRef, { name });
       }
@@ -57,7 +60,7 @@ const Profile = () => {
     }
   };
 
-  return ( //Main container for the profile page, centered
+  return ( //Main container rendering the user profile settings.
     <div className="max-w-md mx-auto my-8 p-4 border rounded">
       <h2 className="text-2xl font-bold mb-4">My Profile</h2>
       {error && <p className="text-red-500 mb-4">{error}</p>}
@@ -99,6 +102,8 @@ const Profile = () => {
           Update Profile
         </button>
       </form>
+      {/* Rewards dashboard for gamification */}
+      <Rewards />
     </div>
   );
 };

@@ -1,4 +1,5 @@
-import React, { useState } from 'react'; //import react and other necessary components
+// /src/pages/Register.jsx
+import React, { useState } from 'react'; //import react and all other necessary components.
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { Link, useNavigate } from 'react-router-dom';
 import app from '../firebase';
@@ -7,33 +8,31 @@ import { db } from '../firebase';
 import Lottie from 'lottie-react';
 import successAnimation from '../assets/animations/success.json';
 
-const Register = () => {
-  const [name, setName] = useState(''); // State variable for storing the user's name
-  const [email, setEmail] = useState(''); //State variable for storing the user's email
-  const [password, setPassword] = useState(''); //State variable for storing the user's password.
-  const [error, setError] = useState(''); // State variable for storing any error messages during registration.
-  const [showAnimation, setShowAnimation] = useState(false); //State variable to control whether the success animation should be displayed.
-  const navigate = useNavigate(); //This is a hook to allow programatic navigation after registration.
+const Register = () => { //Different states to hold different datas.
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [showAnimation, setShowAnimation] = useState(false);
+  const navigate = useNavigate();
   const auth = getAuth(app);
   const [role, setRole] = useState('customer');
 
-  const handleRegister = async (e) => { //This is an asynchronous function to handle the registration process when the form is submitted.
-    e.preventDefault(); //To prevent the default form submission.
+  const handleRegister = async (e) => {
+    e.preventDefault();
     setError('');
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
-      // Update the Auth profile with the display name
       await updateProfile(userCredential.user, { displayName: name });
-      
-      // Save additional user data (including name) to Firestore
+      // Save additional user data with default rewards (points: 0, achievements: [])
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         name,
         email,
         role,
+        points: 0,
+        achievements: [],
         createdAt: serverTimestamp()
       });
-      // Show success animation before navigating
       setShowAnimation(true);
       setTimeout(() => {
         navigate(role === 'seller' ? '/seller-dashboard' : '/');
@@ -43,7 +42,7 @@ const Register = () => {
     }
   };
 
-  if (showAnimation) {
+  if (showAnimation) { //To show lottie animation
     return (
       <div className="max-w-md mx-auto my-8 p-4 flex flex-col items-center">
         <Lottie animationData={successAnimation} style={{ height: 200, width: 200 }} />
@@ -52,12 +51,11 @@ const Register = () => {
     );
   }
 
-  return (
+  return ( //Main container to handle the registration ui.
     <div className="max-w-md mx-auto my-8 p-4">
       <h2 className="text-2xl font-bold mb-4">Register</h2>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <form onSubmit={handleRegister}>
-        {/* Name Input Field */}
         <div className="mb-4">
           <label className="block mb-2">Name</label>
           <input
@@ -68,7 +66,6 @@ const Register = () => {
             required
           />
         </div>
-        {/* Email */}
         <div className="mb-4">
           <label className="block mb-2">Email</label>
           <input
@@ -79,7 +76,6 @@ const Register = () => {
             required
           />
         </div>
-        {/* Account Type */}
         <div className="mb-4">
           <label className="block mb-2">Account Type</label>
           <select
@@ -92,7 +88,6 @@ const Register = () => {
             <option value="seller">Seller</option>
           </select>
         </div>
-        {/* Password */}
         <div className="mb-4">
           <label className="block mb-2">Password</label>
           <input

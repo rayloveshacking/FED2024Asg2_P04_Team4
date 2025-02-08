@@ -1,4 +1,5 @@
-import React from 'react'; //Import react and all other components to have all of the routes.
+// /src/App.jsx
+import React from 'react'; //Import react and all the other components for setting up routes.
 import { Routes, Route } from 'react-router-dom';
 import Shop from './pages/Shop';
 import New from './pages/New';
@@ -14,11 +15,13 @@ import SellerDashboard from './pages/SellerDashBoard';
 import SellerProfile from './pages/SellerProfile';
 import FollowingListings from './pages/FollowingListings';
 import SavedListings from './pages/SavedListings';
+import Chats from './pages/Chats';             // New: List of conversations
+import ChatDetail from './pages/ChatDetail';     // New: Chat conversation detail
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import SearchBar from './components/SearchBar';
 
-const App = () => { //The root component that defines the overall structure and routing of the application.
+const App = () => {
   return (
     <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
       <Navbar />
@@ -39,6 +42,9 @@ const App = () => { //The root component that defines the overall structure and 
         <Route path='/seller/:sellerId' element={<SellerProfile />} />
         <Route path='/following-listings' element={<FollowingListings />} />
         <Route path='/saved-listings' element={<SavedListings />} />
+        {/* New Chat Routes */}
+        <Route path='/chats' element={<Chats />} />
+        <Route path='/chats/:conversationId' element={<ChatDetail />} />
       </Routes>
       <Footer />
     </div>

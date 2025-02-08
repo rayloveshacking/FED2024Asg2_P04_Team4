@@ -1,50 +1,77 @@
-import React, { useState, useEffect } from 'react'; //import react and other necessary components.
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react'; //import react and other neccessary components.
+import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import FollowButton from '../components/FollowButton';
 import ProductItem from '../components/ProductItem';
+import { getAuth } from 'firebase/auth';
 
 const SellerProfile = () => {
-  const { sellerId } = useParams(); //This extract the sellerId from the url params.
-  const [seller, setSeller] = useState(null); //This is a local state to hold seller information.
-  const [products, setProducts] = useState([]); //This is a local state to hold the list of products.
+  const { sellerId } = useParams();
+  const [seller, setSeller] = useState(null);
+  const [products, setProducts] = useState([]);
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
+  
+  // Compute conversationId based on the current user and seller IDs.
+  // Sort the two IDs so the conversation id is consistent regardless of who initiates.
+  const conversationId = currentUser
+    ? [currentUser.uid, sellerId].sort().join('_')
+    : null;
 
   // Fetch seller information from the "users" collection
   useEffect(() => {
-    const fetchSeller = async () => { //Asynchronous function to fetch seller date.
-      const sellerDocRef = doc(db, "users", sellerId); //Get a reference to the seller's document in firestore.
-      const docSnap = await getDoc(sellerDocRef); //Retrieve the seller's document snapshot.
-      if (docSnap.exists()) { // If document exists, update the seller state with the document data.
+    const fetchSeller = async () => {
+      const sellerDocRef = doc(db, "users", sellerId);
+      const docSnap = await getDoc(sellerDocRef);
+      if (docSnap.exists()) {
         setSeller(docSnap.data());
       }
     };
-    fetchSeller(); //Call the function to fetch seller information.
-  }, [sellerId]); //Rerun the effect if sellerId Changes.
+    fetchSeller();
+  }, [sellerId]);
 
   // Fetch the seller's product listings (only non-expired listings)
   useEffect(() => {
-    const q = query( //build the firestore query to get products that belong to this seller and expirydate is greater than the current date.
+    const q = query(
       collection(db, "products"),
       where("sellerId", "==", sellerId),
       where("expiryDate", ">", new Date())
     );
-    const unsubscribe = onSnapshot(q, (snapshot) => { //Set up a real time listener for the query.
-      setProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))); //Map over the snapshot to build an array of products and update state.
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
-    return () => unsubscribe(); //This clean up the listener when the component unmounts or sellerId changes.
+    return () => unsubscribe();
   }, [sellerId]);
 
-  if (!seller) return <div>Loading seller information...</div>; //If the seller information is not loaded yet, render a loading message.
+  if (!seller) return <div>Loading seller information...</div>;
 
-  return ( //Main controller for the seller profile page, centered with a maximum width.
+  return (
     <div className="max-w-4xl mx-auto my-8 p-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-3xl font-bold">{seller.name}</h2>
           <p>Email: {seller.email}</p>
         </div>
-        <FollowButton sellerId={sellerId} />
+        <div className="flex space-x-4">
+          <FollowButton sellerId={sellerId} />
+          {/* Updated Chat Button */}
+          {currentUser ? (
+            <Link
+              to={`/chats/${conversationId}`}
+              className="bg-green-600 text-white px-4 py-2 rounded"
+            >
+              Chat with Seller
+            </Link>
+          ) : (
+            <Link
+              to="/login"
+              className="bg-green-600 text-white px-4 py-2 rounded"
+            >
+              Login to Chat
+            </Link>
+          )}
+        </div>
       </div>
       <h3 className="text-2xl mt-6 mb-4">Seller's Listings</h3>
       {products.length === 0 ? (
@@ -52,7 +79,7 @@ const SellerProfile = () => {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {products.map(product => (
-            <ProductItem //Render a productItem component for each product, the productId is used as a key.
+            <ProductItem
               key={product.id}
               id={product.id}
               image={product.image}

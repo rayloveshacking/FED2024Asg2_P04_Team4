@@ -8,7 +8,7 @@ import ShopContextProvider from './context/ShopContext.jsx' //import shopcontext
 import './firebase' //import firebase configuration to initialize firebase services.
 
 ReactDOM.createRoot(document.getElementById('root')).render( //Create the root element for the react app usign the element with id 'root'.
-  <BrowserRouter basename="/FED2024Asg2_P04_Team4"> 
+  <BrowserRouter basename="/FED2024Asg2_P04_Team4/"> 
     <ShopContextProvider>
       <App />
     </ShopContextProvider>

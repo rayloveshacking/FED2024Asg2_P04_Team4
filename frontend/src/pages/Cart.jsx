@@ -1,20 +1,22 @@
-import React, { useContext, useState } from "react"; //import react and all necessary components.
+// /src/pages/Cart.jsx
+import React, { useContext, useState } from "react"; //import react and other necessary components.
 import { ShopContext } from "../context/ShopContext";
 import CheckoutModal from "../components/CheckoutModal";
+import PointsCheckoutModal from "../components/PointsCheckOutModal";
 
 const Cart = () => {
-  const { cart, removeFromCart, updateCartQuantity, currency, clearCart } = useContext(ShopContext); //Destructure cart related state and functions from ShopContext
-  const [showCheckout, setShowCheckout] = useState(false); //This is the local state to control the visibility of the checkout modal.
+  const { cart, removeFromCart, updateCartQuantity, currency, clearCart } = useContext(ShopContext); //Destructure the cart and related functions from the shop context.
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [showPointsCheckout, setShowPointsCheckout] = useState(false);
 
-  const totalPrice = cart.reduce( //This calculates the total price by reducing the cart items, multiply each item price by quantity and sum up the results.
+  const totalPrice = cart.reduce( //This is to calculate the total price by summing up the cost of each item.
     (acc, item) => acc + item.price * item.quantity,
     0
   );
 
-  return ( //This is the main container for the cart page.
+  return ( //Main container for rendering the cart 
     <div className="max-w-4xl mx-auto my-8 p-4">
       <h2 className="text-2xl font-bold mb-4">Your Cart</h2>
-      {/*Conditional Rendering to show a message if cart is empty otherwise display the cart table */}
       {cart.length === 0 ? (
         <p>Your cart is empty.</p>
       ) : (
@@ -31,7 +33,7 @@ const Cart = () => {
               </tr>
             </thead>
             <tbody>
-              {cart.map((item) => ( //Each cart item will be rendered as a table row with item.id as the unique key.
+              {cart.map((item) => (
                 <tr key={item.id}>
                   <td className="border p-2">
                     <img
@@ -49,7 +51,7 @@ const Cart = () => {
                       type="number"
                       min="1"
                       value={item.quantity}
-                      onChange={(e) => //This is to update the quantity on change, converting the input value to an integer.
+                      onChange={(e) =>
                         updateCartQuantity(item.id, parseInt(e.target.value))
                       }
                       className="w-16 p-1 border"
@@ -74,20 +76,36 @@ const Cart = () => {
             <p className="text-xl font-bold">
               Total: {currency} {totalPrice}
             </p>
-            <button
-              onClick={() => setShowCheckout(true)}
-              className="mt-4 bg-green-600 text-white py-2 px-4 rounded"
-            >
-              Checkout
-            </button>
+            <div className="mt-4 flex justify-end gap-4">
+              <button
+                onClick={() => setShowCheckout(true)}
+                className="bg-green-600 text-white py-2 px-4 rounded"
+              >
+                Checkout with Card
+              </button>
+              <button
+                onClick={() => setShowPointsCheckout(true)}
+                className="bg-purple-600 text-white py-2 px-4 rounded"
+              >
+                Checkout with Coins
+              </button>
+            </div>
           </div>
         </div>
       )}
-      {showCheckout && ( //Condtionally render the modal if showCheckout is true
+      {showCheckout && (
         <CheckoutModal
           cart={cart}
           totalPrice={totalPrice}
           onClose={() => setShowCheckout(false)}
+          clearCart={clearCart}
+        />
+      )}
+      {showPointsCheckout && (
+        <PointsCheckoutModal
+          cart={cart}
+          totalPrice={totalPrice}
+          onClose={() => setShowPointsCheckout(false)}
           clearCart={clearCart}
         />
       )}

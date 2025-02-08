@@ -1,46 +1,47 @@
 // /src/components/Navbar.jsx
-import React, { useContext, useState, useEffect, useRef } from 'react'; //import react and all other necessary components.
+import React, { useContext, useState, useEffect, useRef } from 'react'; //Import react and all other necessary components.
 import { onAuthStateChanged, getAuth, signOut } from 'firebase/auth';
 import { assets } from '../assets/assets';
 import { NavLink, Link } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
 import app from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
-import NotificationBell from './NotificationBell'; // New import for notifications
+import NotificationBell from './NotificationBell';
 
-const Navbar = () => { 
-  const [visible, setVisible] = useState(false); //Different states to store different datas and controls.
+const Navbar = () => {
+  const [visible, setVisible] = useState(false); //Different states to hold and store different datas.
   const { setShowSearch } = useContext(ShopContext);
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const profileRef = useRef(null);
-  const auth = getAuth(app); //Initialize firebase auth with the app config.
+  const auth = getAuth(app);
 
-  useEffect(() => { //This is used to listen for changes in the authentication state.
+  // Listen for authentication changes
+  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
     });
-    return () => unsubscribe(); //This clean up subscription on component unmount.
+    return () => unsubscribe();
   }, [auth]);
 
-  useEffect(() => { //This is to fetch the user's role from firestore when a user is authenticated.
+  // Use a real-time listener to fetch the user's role from Firestore.
+  useEffect(() => {
     if (user) {
-      const fetchUserRole = async () => {
-        const userDocRef = doc(db, 'users', user.uid);
-        const docSnap = await getDoc(userDocRef);
+      const userDocRef = doc(db, 'users', user.uid);
+      const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
         if (docSnap.exists()) {
           setUserRole(docSnap.data().role);
         }
-      };
-      fetchUserRole();
+      });
+      return () => unsubscribe();
     } else {
       setUserRole(null);
     }
   }, [user]);
 
-  const handleLogout = async () => { //This is the function to handle user logout.
+  const handleLogout = async () => { //Function for the users to be able to logout 
     try {
       await signOut(auth);
       setProfileMenuOpen(false);
@@ -49,7 +50,8 @@ const Navbar = () => {
     }
   };
 
-  useEffect(() => { //This is used to close the profile dropdown if a click is detected outside.
+  // Close profile dropdown on outside click.
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setProfileMenuOpen(false);
@@ -59,7 +61,7 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [profileRef]);
 
-  return ( //The main container for navbar, styled to space items fairly.
+  return ( //Main container for rendering the nav menu 
     <div className='flex items-center justify-between py-5 font-medium'>
       <Link to={'/'}>
         <img src={assets.logo} className='w-36' alt="Logo" />
@@ -118,6 +120,7 @@ const Navbar = () => {
                     <Link onClick={() => setProfileMenuOpen(false)} to="/orders" className="cursor-pointer hover:text-black">
                       Orders
                     </Link>
+                    {/* Seller Dashboard appears only if the user's role is "seller" */}
                     {userRole === 'seller' && (
                       <Link onClick={() => setProfileMenuOpen(false)} to="/seller-dashboard" className="cursor-pointer hover:text-black">
                         Seller Dashboard

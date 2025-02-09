@@ -2,7 +2,7 @@
 
 Mokesell is a premium ecommerce online store that will bring the latest products from brand new arrivals to high quality refurbished products. Built with React and Vite, MokeSell offers a smooth, responsive shopping experience with advanced features such as product bumping, saved listings and real time order tracking. Our mission is to make online shopping both enjoyable and efficient for every user.
 
-## Visit our website:
+## Visit our website deployed with GitHub Pages:
 -[MokeSell](https://rayloveshacking.github.io/FED2024Asg2_P04_Team4/)
 
 ## Our Video Presentation:
